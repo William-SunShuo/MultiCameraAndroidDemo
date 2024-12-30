@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.Surface
 import android.view.TextureView
 import android.widget.Button
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -59,6 +60,20 @@ class VideoPlayActivity : AppCompatActivity() {
             }
         }
 
+        BLRTCServerSession.onMessageListener = object : OnMessageListener {
+            override fun onDecodedFrame(pixelBuffer: ByteArray?) {
+                Log.d("Native", "pixelBuffer size:${pixelBuffer?.size}")
+                if (pixelBuffer != null) {
+                    handleDecodedData(pixelBuffer)
+                }
+            }
+
+            override fun onPeerMessage(client: String?, msgType: Int, msg: ByteArray?) {
+//                TODO("Not yet implemented")
+            }
+
+        }
+
     }
 
     private fun startDecoding(surface: Surface) {
@@ -75,6 +90,27 @@ class VideoPlayActivity : AppCompatActivity() {
     external fun decodeH264(filePath: String)
 
     fun handleDecodedData(decodedData: ByteArray) {
+//        lifecycleScope.launch {
+//            // 直接使用解码后的数据，避免额外的内存复制
+//            val yuvImage = YuvImage(decodedData, ImageFormat.NV21, 1280, 720, null) // 根据你的 YUV 格式调整
+//            val byteArrayOutputStream = ByteArrayOutputStream()
+//            yuvImage.compressToJpeg(Rect(0, 0, 1280, 720), 100, byteArrayOutputStream)
+//            val imageBytes = byteArrayOutputStream.toByteArray()
+//
+//            // 转换为 Bitmap
+//            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+//
+//            // 获取 TextureView 的 Canvas 并绘制 Bitmap
+//            textureView.post {
+//                val canvas = textureView.lockCanvas()
+//                canvas?.drawBitmap(bitmap, 0f, 0f, null)
+//                canvas?.let { textureView.unlockCanvasAndPost(it) }
+//
+//                // 释放 Bitmap 占用的内存
+//                bitmap.recycle()
+//            }
+//        }
+        val image = findViewById<ImageView>(R.id.image)
         lifecycleScope.launch {
             // 直接使用解码后的数据，避免额外的内存复制
             val yuvImage = YuvImage(decodedData, ImageFormat.NV21, 1280, 720, null) // 根据你的 YUV 格式调整
@@ -85,15 +121,7 @@ class VideoPlayActivity : AppCompatActivity() {
             // 转换为 Bitmap
             val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
-            // 获取 TextureView 的 Canvas 并绘制 Bitmap
-            textureView.post {
-                val canvas = textureView.lockCanvas()
-                canvas?.drawBitmap(bitmap, 0f, 0f, null)
-                canvas?.let { textureView.unlockCanvasAndPost(it) }
-
-                // 释放 Bitmap 占用的内存
-                bitmap.recycle()
-            }
+            image.setImageBitmap(bitmap)
         }
     }
 

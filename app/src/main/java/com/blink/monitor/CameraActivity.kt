@@ -144,9 +144,9 @@ class CameraActivity : AppCompatActivity() {
                     val midTime = System.nanoTime()
 
 // 执行处理方法
-                    yuv420Planar?.let {
-                        processImageForEncoding(it, it.size)
-                    }
+//                    yuv420Planar?.let {
+//                        processImageForEncoding(it, it.size)
+//                    }
 
 // 获取结束时间
                     val endTime = System.nanoTime()

@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var ip: String? = null
-    private var session: BLRTCServerSession? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +37,9 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onPeerMessage(msgType: Int, data: ByteArray?) {
                         val msg = data?.let { String(it) }
-                        Log.d("Native", "onPeerMessage,msgType: ${Command.printCommand(msgType)}, msg: $msg")
+                        Log.d("Native", "onPeerMessage,msgType: ${printCommand(msgType)}, msg: $msg")
                         lifecycleScope.launch(Dispatchers.Main) {
-                            binding.tvMessage.text = "msgType: ${Command.printCommand(msgType)}, msg: $msg"
+                            binding.tvMessage.text = "msgType: ${printCommand(msgType)}, msg: $msg"
                         }
                     }
                 })
@@ -49,8 +48,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.startMonitor.setOnClickListener{
-            session = BLRTCServerSession().apply {
-                addListener(object : BLRTCServerSessionListener {
+            BLRTCServerSession.createSession()
+            BLRTCServerSession.apply {
+                onConnectListener = object:OnConnectListener{
                     override fun onPeerAddress(ipAddress: String?, deviceName: String?) {
                         Log.d("Native", "Peer Address: $ipAddress, Device: $deviceName, thread: ${Thread.currentThread().name}")
                         ip = ipAddress
@@ -66,35 +66,38 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun onDecodedFrame(pixelBuffer: ByteArray?) {
-                        Log.d("Native", "Decoded Frame Size: " + pixelBuffer!!.size)
-                    }
-                })
-                startSession()
+                }
+                createSession()
             }
         }
 
         binding.connect.setOnClickListener {
-            session?.run {
-                ip?.let {
-                    connectPeerSession(it)
-                } ?: Toast.makeText(
-                    this@MainActivity, "no ip address", Toast.LENGTH_SHORT
-                ).show()
+            ip?.let {
+                BLRTCServerSession.connectPeerSession(it)
             } ?: Toast.makeText(
-                this, "Please start monitor first", Toast.LENGTH_SHORT
+                this@MainActivity, "no ip address", Toast.LENGTH_SHORT
             ).show()
+//            session?.run {
+//
+//            } ?: Toast.makeText(
+//                this, "Please start monitor first", Toast.LENGTH_SHORT
+//            ).show()
         }
 
         binding.sendMessage.setOnClickListener {
-            session?.run {
-                val message = "Hello from Android"
-                ip?.let {
-                    sendMessage(message.toByteArray(), Command.ControlPhoto, it)
-                }
-            } ?: Toast.makeText(
-                this, "Please start monitor first", Toast.LENGTH_SHORT
-            ).show()
+//            session?.run {
+//                val message = "Hello from Android"
+//                ip?.let {
+//                    sendMessage(message.toByteArray(), Command.ControlPhoto, it)
+//                }
+//            } ?: Toast.makeText(
+//                this, "Please start monitor first", Toast.LENGTH_SHORT
+//            ).show()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        BLRTCServerSession.onConnectListener = null
     }
 }

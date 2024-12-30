@@ -94,6 +94,7 @@ public:
         onPeerAddressMethod = env->GetMethodID(cls, "onPeerAddress", "(Ljava/lang/String;Ljava/lang/String;)V");
         onPeerConnectStatusMethod = env->GetMethodID(cls, "onPeerConnectStatus", "(Ljava/lang/String;I)V");
         onDecodedFrameMethod = env->GetMethodID(cls, "onDecodedFrame", "([B)V");
+        onPeerMessageMethod = env->GetMethodID(cls, "onPeerMessage", "(Ljava/lang/String;I[B)V");
     }
 
     ~JavaBLRTCServerSessionListener() {
@@ -127,12 +128,27 @@ public:
         env->DeleteLocalRef(jPixelBuffer);
     }
 
+    void onPeerMessage(BLNSPClient& client,NSPMessage& message) override {
+        JNIEnv* env = getJNIEnv();
+        // 提取 msgType
+        jint msgType = static_cast<jint>(message.msgType);
+        // 创建 byte[] (jbyteArray) 并填充数据
+        jbyteArray byteArray = env->NewByteArray(message.length);
+        if (byteArray) {
+            env->SetByteArrayRegion(byteArray, 0, message.length, reinterpret_cast<jbyte*>(message.data));
+        }
+        // 调用 Java 回调方法
+        env->CallVoidMethod(listenerGlobalRef, onPeerMessageMethod, msgType, byteArray);
+        // 释放本地引用
+        if (byteArray) env->DeleteLocalRef(byteArray);
+    }
     static JavaVM* javaVM; // 全局 JavaVM 对象
 private:
     jobject listenerGlobalRef;
     jmethodID onPeerAddressMethod;
     jmethodID onPeerConnectStatusMethod;
     jmethodID onDecodedFrameMethod;
+    jmethodID onPeerMessageMethod;
 
     JNIEnv* getJNIEnv() {
         // 使用全局 JavaVM
