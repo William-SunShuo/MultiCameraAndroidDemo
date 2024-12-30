@@ -40,6 +40,7 @@ target_link_libraries("push"
         # List libraries link to the target library
         android
         log
+        mediandk
         ${LIBRARY_NAMES})
 
 target_link_libraries("server"
@@ -47,6 +48,7 @@ target_link_libraries("server"
         # List libraries link to the target library
         android
         log
+        mediandk
         ${LIBRARY_NAMES})
 
 # Specifies libraries CMake should link to your target library. You
