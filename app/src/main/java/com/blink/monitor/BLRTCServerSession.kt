@@ -6,6 +6,7 @@ object BLRTCServerSession {
     private var nativeHandle: Long = 0
     var onConnectListener: OnConnectListener? = null
     var onMessageListener: OnMessageListener? = null
+    private var connectedIp: String? = null
 
     init {
         System.loadLibrary("server")
@@ -22,6 +23,7 @@ object BLRTCServerSession {
                     "Native",
                     "Peer Address: $ipAddress, Device: $deviceName, thread: ${Thread.currentThread().name}"
                 )
+                connectedIp = ipAddress
                 onConnectListener?.onPeerAddress(ipAddress, deviceName)
             }
 
@@ -30,6 +32,7 @@ object BLRTCServerSession {
                     "Native",
                     "Client: $client, Status: $status, thread: ${Thread.currentThread().name}"
                 )
+//                connectedIp = if (status == 1) client else null
                 onConnectListener?.onPeerConnectStatus(client, status)
             }
 
@@ -57,7 +60,7 @@ object BLRTCServerSession {
     external fun connectPeerSession(peerIp: String?, nativeHandle: Long = this.nativeHandle)
     external fun stopSession(nativeHandle: Long = this.nativeHandle)
     external fun sendMessage(
-        msg: ByteArray? = null, msgType: Int, client: String? = null, nativeHandle: Long = this.nativeHandle
+        msg: ByteArray? = null, msgType: Int, clientIp: String? = this.connectedIp, nativeHandle: Long = this.nativeHandle
     )
 
     // 添加 addListener 方法

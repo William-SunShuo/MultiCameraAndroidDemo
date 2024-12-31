@@ -43,12 +43,14 @@ Java_com_blink_monitor_BLRTCServerSession_stopSession(JNIEnv *env, jobject thiz,
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_blink_monitor_BLRTCServerSession_sendMessage(JNIEnv *env, jobject thiz, jbyteArray msg,jint msgType,
-                                                      jstring client, jlong handle) {
+                                                      jstring clientIp, jlong handle) {
     auto* session = getNativeHandle(handle);
     if (session) {
-        const char* clientStr = env->GetStringUTFChars(client, nullptr);
-        std::string clientCpp(clientStr);
-
+        if (clientIp == nullptr) {
+            return;
+        }
+        const char *clientIpStr = env->GetStringUTFChars(clientIp, nullptr);
+        std::string client(clientIpStr);
         char buffer[1024];
         NSPMessage nspMessage;
         nspMessage.msgType = static_cast<NSPMessageType>(msgType);
@@ -63,9 +65,8 @@ Java_com_blink_monitor_BLRTCServerSession_sendMessage(JNIEnv *env, jobject thiz,
         std::strcpy(nspMessage.data, msgBuffer);
         nspMessage.setLength();
         nspMessage.packet(buffer);
-        session->sendMessage(&nspMessage, clientCpp);
-
-        env->ReleaseStringUTFChars(client, clientStr);
+        session->sendMessage(&nspMessage, client);
+        env->ReleaseStringUTFChars(clientIp, clientIpStr);
         delete[] msgBuffer;
     }
 }
