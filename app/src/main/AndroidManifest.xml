@@ -22,7 +22,7 @@
         android:theme="@style/Theme.MultiCameraDemo"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".DemoPlateActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,6 +33,7 @@
 
         <activity android:name=".CameraActivity"/>
         <activity android:name=".VideoPlayActivity"/>
+<!--        <activity android:name=".DemoPlateActivity"/>-->
 
     </application>
 
