@@ -6,6 +6,8 @@ const val ControlLeft = 6
 const val ControlRight = 7
 const val ControlStart = 8
 const val ControlStop = 9
+const val ControlMute = 10
+const val ControlHide = 11
 const val ControlPhoto = 16
 const val ControlDot = 17
 const val ScoreBoard = 18
@@ -24,6 +26,8 @@ fun printCommand(command: Int): String {
         ControlDot -> "ControlDot"
         ScoreBoard -> "ScoreBoard"
         ZoomInOut -> "ZoomInOut"
+        ControlMute -> "ControlMute"
+        ControlHide -> "ControlHide"
         else -> "Unknown command"
     }
 }
