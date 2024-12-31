@@ -34,7 +34,7 @@ class ColorPlateView @JvmOverloads constructor(
         val plateView: PlateView = findViewById(R.id.plate)
 
         plateView.apply {
-            moveAction = { _, eventX, eventY ->
+            moveAction = { _, eventX, eventY, sv ->
                 /**
                  * 1. x,y点位手势落点，相对于当前控件的顶点;
                  * 2. xml中对x-y点到控件顶点做了映射：
@@ -44,11 +44,10 @@ class ColorPlateView @JvmOverloads constructor(
                 cursorLayoutParams.leftMargin = eventX.toInt()
                 cursorLayoutParams.topMargin = eventY.toInt()
                 cursorView.layoutParams = cursorLayoutParams
-                updateHSV(this.getHSV())
+                updateHSV(sv)
                 colorAction?.invoke(Color.HSVToColor(HSV))
             }
-            post { middleState()
-            }
+            post { middleState() }
 
         }
 
@@ -56,7 +55,7 @@ class ColorPlateView @JvmOverloads constructor(
         barView.setOnColorChangeListener(object :ColorSeekBar.SeekBarColorChangeListener {
             override fun colorChange(color: Int) {
                 //update h;同时更新到面板;
-                val barHsv = floatArrayOf(0f, 0f, 0f)
+                val barHsv = floatArrayOf(0f, 1f, 1f)
                 Color.colorToHSV(color, barHsv)
                 //保留原来的饱和度,明暗度;
                 HSV[0] = barHsv[0]
@@ -69,9 +68,8 @@ class ColorPlateView @JvmOverloads constructor(
 
 
     private fun updateHSV(hsv: FloatArray) {
-        HSV[1] = hsv[1]
-        HSV[2] = hsv[2]
-
+        HSV[1] = hsv[0]
+        HSV[2] = hsv[1]
         Log.d("tag", "${HSV.toList()}")
     }
 

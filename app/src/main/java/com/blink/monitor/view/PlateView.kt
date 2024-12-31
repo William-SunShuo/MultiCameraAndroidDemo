@@ -30,7 +30,7 @@ class PlateView @JvmOverloads constructor(context: Context,
     private var mRectF: RectF? = null
     private var mShader: LinearGradient? = null
 
-    var moveAction: ((View, Float, Float) -> Unit) ? = null
+    var moveAction: ((View, Float, Float, FloatArray) -> Unit) ? = null
 
 
 
@@ -45,14 +45,15 @@ class PlateView @JvmOverloads constructor(context: Context,
                     if(x < 0) x = 0f
                     if(x > measuredWidth) x = measuredWidth.toFloat()
                     //设置s向量值；颜色饱和
-                    HSV[1] = 1.0f / measuredWidth * x
+                    val hsvSelected = floatArrayOf(0f, 0f)
+                    hsvSelected[0] = 1.0f / measuredWidth * x
 
                     if(y > measuredHeight) y = measuredHeight.toFloat()
                     if(y < 0) y = 0f
                     //设置v向量值；代表颜色明暗
-                    HSV[2] = 1.0f / measuredHeight * y
+                    hsvSelected[1] = 1f - (1.0f / measuredHeight * y)
 
-                    locationCursor(x, y)
+                    locationCursor(x, y, hsvSelected)
                 }
             }
        }
@@ -61,22 +62,16 @@ class PlateView @JvmOverloads constructor(context: Context,
     }
 
 
-    //初次进来落点在中间;
+    //初次进来落点在;
     fun middleState() {
-        HSV[1] = 1.0f / 2
-        HSV[2] = 1.0f / 2
-        locationCursor(measuredWidth /2f, measuredHeight/2f)
+        locationCursor(measuredWidth.toFloat()/2f , measuredHeight.toFloat() /2f, floatArrayOf(0.5f, 0.5f))
     }
 
     //定位对应的图片控件位置.
-    private fun locationCursor(x: Float, y: Float) {
-        moveAction?.invoke(this, x, y)
+    private fun locationCursor(x: Float, y: Float, sv: FloatArray) {
+        moveAction?.invoke(this, x, y, sv)
     }
 
-
-    fun getHSV(): FloatArray {
-        return HSV
-    }
 
     fun setHue(hue: Float) {
         HSV[0] = hue
