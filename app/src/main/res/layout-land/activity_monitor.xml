@@ -190,4 +190,14 @@
         app:layout_constraintBottom_toBottomOf="@id/cameraView"
         app:layout_constraintRight_toRightOf="@id/cameraView" />
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/compose_joystick_container"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginStart="38dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/bt_direction"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.497" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
