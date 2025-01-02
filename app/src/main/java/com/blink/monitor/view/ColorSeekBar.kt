@@ -45,7 +45,7 @@ class ColorSeekBar(context: Context, attributeSet: AttributeSet): View(context, 
     private var thumbBorderPaint: Paint = Paint()
     private var thumbPaint: Paint = Paint()
     private lateinit var colorGradient: LinearGradient
-    private var thumbX: Float = 24f
+    private var thumbX: Float = 10f
     private var thumbY: Float = (canvasHeight/2).toFloat()
 
     private var thumbRadius: Float = 16f
@@ -64,8 +64,6 @@ class ColorSeekBar(context: Context, attributeSet: AttributeSet): View(context, 
             if (colorsId != 0) colorSeeds = getColorsById(colorsId)
             barCornerRadius = typedArray.getDimension(R.styleable.ColorSeekBar_cornerRadius, 8f)
             barHeight = typedArray.getDimension(R.styleable.ColorSeekBar_barHeight, 20f).toInt()
-            paddingStart = barHeight /2f
-            paddingEnd = paddingStart
             typedArray.recycle()
         }
         rectPaint.isAntiAlias = true
@@ -181,7 +179,6 @@ class ColorSeekBar(context: Context, attributeSet: AttributeSet): View(context, 
 
     fun getColor()  = thumbPaint.color
 
-//    fun getHSV(hsv: FloatArray) = Color.colorToHSV(thumbPaint.color, hsv)
 
     fun setOnColorChangeListener(onColorChangeListener: SeekBarColorChangeListener) {
         this.colorChangeListener = onColorChangeListener
