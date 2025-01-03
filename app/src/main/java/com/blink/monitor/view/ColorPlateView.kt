@@ -2,12 +2,14 @@ package com.blink.monitor.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import com.blink.monitor.R
 
 /**
@@ -30,8 +32,10 @@ class ColorPlateView @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        val cursorView = findViewById<View>(R.id.plate_cursor)
+//        val cursorView = findViewById<ImageView>(R.id.plate_cursor)
+        val groupView = findViewById<View>(R.id.cursor_group)
         val plateView: PlateView = findViewById(R.id.plate)
+        val cursor = findViewById<ImageView>(R.id.plate_cursor)
 
         plateView.apply {
             moveAction = { _, eventX, eventY, sv ->
@@ -40,14 +44,18 @@ class ColorPlateView @JvmOverloads constructor(
                  * 2. xml中对x-y点到控件顶点做了映射：
                  */
                 val cursorLayoutParams: MarginLayoutParams =
-                    cursorView.layoutParams as MarginLayoutParams
+                    groupView.layoutParams as MarginLayoutParams
                 cursorLayoutParams.leftMargin = eventX.toInt()
                 cursorLayoutParams.topMargin = eventY.toInt()
-                cursorView.layoutParams = cursorLayoutParams
+                groupView.layoutParams = cursorLayoutParams
+
                 updateHSV(sv)
+                groupView.visibility = View.VISIBLE
+                Log.d("color", "hsv:${HSV.toList()}")
+                cursor.imageTintList = ColorStateList.valueOf(Color.HSVToColor(HSV))
                 colorAction?.invoke(Color.HSVToColor(HSV))
             }
-            post { middleState() }
+            groupView.visibility = View.GONE
 
         }
 
@@ -57,11 +65,12 @@ class ColorPlateView @JvmOverloads constructor(
                 //update h;同时更新到面板;
                 val barHsv = floatArrayOf(0f, 1f, 1f)
                 Color.colorToHSV(color, barHsv)
-                //保留原来的饱和度,明暗度;
-                HSV[0] = barHsv[0]
+                //清除原来的饱和度和明暗度;
+                HSV = barHsv
                 plateView.setHue(barHsv[0])
-                Log.d("tag", "${HSV.toList()}")
-                colorAction?.invoke(Color.HSVToColor(HSV))
+                groupView.visibility = View.GONE
+                Log.d("color", "hsv:${HSV.toList()}")
+                colorAction?.invoke(Color.HSVToColor(barHsv))
             }
         })
     }
@@ -70,14 +79,12 @@ class ColorPlateView @JvmOverloads constructor(
     private fun updateHSV(hsv: FloatArray) {
         HSV[1] = hsv[0]
         HSV[2] = hsv[1]
-        Log.d("tag", "${HSV.toList()}")
     }
 
 
     interface OnColorChangeListener {
 
         fun onColorChange(colorInt: Int)
-
     }
 
 }

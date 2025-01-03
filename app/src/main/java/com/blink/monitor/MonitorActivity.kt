@@ -1,7 +1,11 @@
 package com.blink.monitor
 
+
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -12,9 +16,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.blink.monitor.databinding.ActivityMonitorBinding
+import com.blink.monitor.extention.dp
 import com.blink.monitor.viewmodel.MonitorViewModel
+import com.blink.monitor.window.ScoreboardWindow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+
 
 class MonitorActivity : AppCompatActivity() {
 
@@ -22,6 +29,8 @@ class MonitorActivity : AppCompatActivity() {
 
     private val viewModel: MonitorViewModel by viewModels()
     private val hideViews = mutableListOf<View>()
+
+    private var scorePopUp: ScoreboardWindow? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +58,7 @@ class MonitorActivity : AppCompatActivity() {
                 button.isSelected = !button.isSelected
                 when (it.id) {
                     R.id.bt_home -> finish()
-                    R.id.bt_scoreboard -> toggleScoreBoard(it.isSelected)
+                    R.id.bt_scoreboard -> toggleScoreBoard(it, it.isSelected)
                     R.id.bt_direction -> toggleDirection(it.isSelected)
                     R.id.bt_mute -> toggleMute(it.isSelected)
                     R.id.bt_hide -> toggleViews(it.isSelected)
@@ -100,8 +109,19 @@ class MonitorActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleScoreBoard(showScoreBoard: Boolean) {
-
+    private fun toggleScoreBoard(view: View, showScoreBoard: Boolean) {
+        if (showScoreBoard) {
+            scorePopUp = ScoreboardWindow(this)
+            val location = intArrayOf(0, 0)
+            view.getLocationOnScreen(location)
+            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+            scorePopUp?.showAtLocation(
+                view, Gravity.NO_GRAVITY, location[0] + 17.dp.toInt(),
+                (screenHeight / 2 - 320.dp / 2).toInt()
+            )
+        } else {
+            scorePopUp?.dismiss()
+        }
     }
 
     private fun toggleDirection(showDirection: Boolean) {
