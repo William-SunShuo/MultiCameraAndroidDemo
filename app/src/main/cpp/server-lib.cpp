@@ -5,6 +5,7 @@
 #define  LOG_TAG    "Native"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #include <android/native_window_jni.h>
+#include <android/native_window.h>
 
 using namespace rtcsdk;
 // 全局函数用于将 Java 的 long 转换为 C++ 的指针
@@ -14,10 +15,12 @@ inline BLRTCServerSession* getNativeHandle(jlong handle) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_blink_monitor_BLRTCServerSession_startSession(JNIEnv *env, jobject thiz, jlong handle) {
+Java_com_blink_monitor_BLRTCServerSession_startSession(JNIEnv *env, jobject thiz,jobject surface, jlong handle) {
     auto* session = getNativeHandle(handle);
     if (session) {
         session->startSession();
+        ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
+        session->setSurface(nativeWindow);
     }
 }
 extern "C"
@@ -183,12 +186,17 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_blink_monitor_BLRTCServerSession_setSurface(JNIEnv *env, jobject thiz,
-                                                     jobject surface, jlong handle) {
-    auto *session = reinterpret_cast<BLRTCServerSession *>(handle);
+Java_com_blink_monitor_BLRTCServerSession_setSurface(JNIEnv *env, jobject thiz,jobject surface, jlong handle) {
+    auto *session = getNativeHandle(handle);
     LOGI("setSurface");
     if (session) {
         ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
-        session->setSurface(nativeWindow);
+        if (nativeWindow != nullptr) {
+            // 成功获取 ANativeWindow，可以继续使用它
+            session->setSurface(nativeWindow);
+        } else {
+            // 处理错误
+            LOGI("setSurface failed");
+        }
     }
 }
