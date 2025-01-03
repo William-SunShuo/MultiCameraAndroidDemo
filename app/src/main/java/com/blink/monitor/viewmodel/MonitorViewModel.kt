@@ -1,4 +1,5 @@
 package com.blink.monitor.viewmodel
+
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,9 @@ class MonitorViewModel : ViewModel() {
     private var startTime: Long = 0L
     private var isRunning = false // 计时标志
 
+    private val _isShowJoystick = MutableLiveData(false)
+    val isShowJoystick = _isShowJoystick
+
     init {
         BLRTCServerSession.run {
             onMessageListener = object : OnMessageListener {
@@ -43,6 +47,10 @@ class MonitorViewModel : ViewModel() {
             }
             createSession()
         }
+    }
+
+    fun toggleJoystick(boolean: Boolean) {
+        _isShowJoystick.value = boolean
     }
 
     fun startTimer() {

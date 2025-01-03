@@ -1,5 +1,6 @@
 package com.blink.monitor
 
+
 import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
@@ -72,6 +73,10 @@ class MonitorActivity : AppCompatActivity() {
             binding.tvBattery.text = it.toString()
         }
 
+        viewModel.isShowJoystick.observe(this) {
+            binding.composeJoystickContainer.visibility = if (it) View.VISIBLE else View.GONE
+        }
+
         // 监听时间更新
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -80,6 +85,10 @@ class MonitorActivity : AppCompatActivity() {
                 }
             }
         }
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.compose_joystick_container, JoyStickFragment())
+            .commit()
     }
 
     private fun setFullScreen() {
@@ -116,7 +125,7 @@ class MonitorActivity : AppCompatActivity() {
     }
 
     private fun toggleDirection(showDirection: Boolean) {
-
+        viewModel.toggleJoystick(showDirection)
     }
 
     private fun toggleMute(mute: Boolean) {

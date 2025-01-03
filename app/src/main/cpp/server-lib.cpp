@@ -4,7 +4,7 @@
 #include <android/log.h>
 #define  LOG_TAG    "Native"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-
+#include <android/native_window_jni.h>
 
 using namespace rtcsdk;
 // 全局函数用于将 Java 的 long 转换为 C++ 的指针
@@ -179,4 +179,16 @@ JavaVM* JavaBLRTCServerSessionListener::javaVM = nullptr;
 extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     JavaBLRTCServerSessionListener::javaVM = vm;
     return JNI_VERSION_1_6;
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_blink_monitor_BLRTCServerSession_setSurface(JNIEnv *env, jobject thiz,
+                                                     jobject surface, jlong handle) {
+    auto *session = reinterpret_cast<BLRTCServerSession *>(handle);
+    LOGI("setSurface");
+    if (session) {
+        ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
+        session->setSurface(nativeWindow);
+    }
 }

@@ -1,5 +1,6 @@
 package com.blink.monitor
 import android.util.Log
+import android.view.Surface
 
 object BLRTCServerSession {
 
@@ -67,6 +68,8 @@ object BLRTCServerSession {
     private external fun addListener(
         listener: BLRTCServerSessionListener?, nativeHandle: Long = this.nativeHandle
     )
+
+    external fun setSurface(surfaceView: Surface, nativeHandle: Long = this.nativeHandle): String
 
     private external fun nativeCreate(): Long
     private external fun nativeDestroy(nativeHandle: Long)
