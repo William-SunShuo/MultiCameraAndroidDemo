@@ -12,6 +12,5 @@ class DemoPlateActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDemoPlateBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
     }
 }

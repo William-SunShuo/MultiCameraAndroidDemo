@@ -20,7 +20,7 @@ class ColorPlateView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private var HSV = floatArrayOf(1f, 1f, 1f)
+    private var colorHsv = floatArrayOf(1f, 1f, 1f)
 
     var colorAction: ((Int) -> Unit)? = null
 
@@ -32,7 +32,6 @@ class ColorPlateView @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-//        val cursorView = findViewById<ImageView>(R.id.plate_cursor)
         val groupView = findViewById<View>(R.id.cursor_group)
         val plateView: PlateView = findViewById(R.id.plate)
         val cursor = findViewById<ImageView>(R.id.plate_cursor)
@@ -48,15 +47,14 @@ class ColorPlateView @JvmOverloads constructor(
                 cursorLayoutParams.leftMargin = eventX.toInt()
                 cursorLayoutParams.topMargin = eventY.toInt()
                 groupView.layoutParams = cursorLayoutParams
-
-                updateHSV(sv)
+                colorHsv[1] = sv[0]
+                colorHsv[2] = sv[1]
                 groupView.visibility = View.VISIBLE
-                Log.d("color", "hsv:${HSV.toList()}")
-                cursor.imageTintList = ColorStateList.valueOf(Color.HSVToColor(HSV))
-                colorAction?.invoke(Color.HSVToColor(HSV))
+                Log.d("color", "hsv:${colorHsv.toList()}")
+                cursor.imageTintList = ColorStateList.valueOf(Color.HSVToColor(colorHsv))
+                colorAction?.invoke(Color.HSVToColor(colorHsv))
             }
             groupView.visibility = View.GONE
-
         }
 
         val barView = findViewById<ColorSeekBar>(R.id.seek_bar)
@@ -66,20 +64,15 @@ class ColorPlateView @JvmOverloads constructor(
                 val barHsv = floatArrayOf(0f, 1f, 1f)
                 Color.colorToHSV(color, barHsv)
                 //清除原来的饱和度和明暗度;
-                HSV = barHsv
+                colorHsv = barHsv
                 plateView.setHue(barHsv[0])
                 groupView.visibility = View.GONE
-                Log.d("color", "hsv:${HSV.toList()}")
+                Log.d("color", "hsv:${colorHsv.toList()}")
                 colorAction?.invoke(Color.HSVToColor(barHsv))
             }
         })
     }
 
-
-    private fun updateHSV(hsv: FloatArray) {
-        HSV[1] = hsv[0]
-        HSV[2] = hsv[1]
-    }
 
 
     interface OnColorChangeListener {

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="220dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    tools:layout_height="wrap_content"
+    tools:layout_width="220dp">
+
+
+    <LinearLayout
+        android:id="@+id/game_part"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/one_part"
+            android:layout_width="52dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/part_item_selector"
+            android:gravity="center"
+            android:text="1ST"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/two_part"
+            android:layout_width="52dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/part_item_selector"
+            android:gravity="center"
+            android:text="2ND"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+
+        <TextView
+            android:id="@+id/three_part"
+            android:layout_width="52dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/part_item_selector"
+            android:gravity="center"
+            android:text="3RD"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/four_part"
+            android:layout_width="52dp"
+            android:layout_height="24dp"
+            android:background="@drawable/part_item_selector"
+            android:gravity="center"
+            android:text="4TH"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/team_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/home_team"
+            android:layout_width="100dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/shape_part_item_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            tools:text="Apex" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/other_team"
+            android:layout_width="100dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/shape_part_item_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            tools:text="Galaxy" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/team_score"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/home_score"
+            android:layout_width="100dp"
+            android:layout_height="74dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/shape_part_item_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:inputType="number"
+            android:text="0"
+            tools:ignore="TextViewEdits" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/other_score"
+            android:layout_width="100dp"
+            android:layout_height="74dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/shape_part_item_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:inputType="number"
+            android:text="0" />
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp">
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_gravity="start"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/add_home_score"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/score_count_add_selector"
+                />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/del_home_score"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/score_count_del_selector"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/add_other_score"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/score_count_add_selector"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/del_other_score"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/score_count_del_selector"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+</LinearLayout>

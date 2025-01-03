@@ -15,7 +15,7 @@ class CaptureDevicesActivity : AppCompatActivity() {
                 }
 
             }
-            createSession()
+//            createSession()
         }
     }
 

@@ -110,18 +110,20 @@ class MonitorActivity : AppCompatActivity() {
     }
 
     private fun toggleScoreBoard(view: View, showScoreBoard: Boolean) {
-        if (showScoreBoard) {
-            scorePopUp = ScoreboardWindow(this)
-            val location = intArrayOf(0, 0)
-            view.getLocationOnScreen(location)
-            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
-            scorePopUp?.showAtLocation(
-                view, Gravity.NO_GRAVITY, location[0] + 17.dp.toInt(),
-                (screenHeight / 2 - 320.dp / 2).toInt()
-            )
-        } else {
-            scorePopUp?.dismiss()
-        }
+//        if (showScoreBoard) {
+//            scorePopUp = ScoreboardWindow(this)
+//            val location = intArrayOf(0, 0)
+//            view.getLocationOnScreen(location)
+//            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+//            scorePopUp?.showAtLocation(
+//                view, Gravity.NO_GRAVITY, location[0] + 17.dp.toInt(),
+//                (screenHeight / 2 - 320.dp / 2).toInt()
+//            )
+//        } else {
+//            scorePopUp?.dismiss()
+//        }
+
+
     }
 
     private fun toggleDirection(showDirection: Boolean) {

@@ -11,7 +11,7 @@ import androidx.annotation.ArrayRes
 import com.blink.monitor.R
 
 /**
- * 颜色取色进度条;
+ * 取色进度条;
  */
 class ColorSeekBar(context: Context, attributeSet: AttributeSet): View(context, attributeSet){
 
@@ -164,6 +164,7 @@ class ColorSeekBar(context: Context, attributeSet: AttributeSet): View(context, 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when(event?.action){
 
+            MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_MOVE -> {
                 parent.requestDisallowInterceptTouchEvent(true)
                 event.x.let {
