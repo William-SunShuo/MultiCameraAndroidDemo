@@ -7,6 +7,7 @@ import android.graphics.YuvImage
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Surface
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.startMonitor.setOnClickListener{
-            BLRTCServerSession.createSession()
+//            BLRTCServerSession.createSession()
             BLRTCServerSession.apply {
                 onConnectListener = object:OnConnectListener{
                     override fun onPeerAddress(ipAddress: String?, deviceName: String?) {
@@ -85,8 +86,12 @@ class MainActivity : AppCompatActivity() {
                     }
 
                 }
-                createSession()
-                setSurface(binding.surfaceView.holder.surface)
+
+                binding.surfaceView.surfaceTexture?.let {
+                    val surface = Surface(it)
+//                    setSurface(surface)
+                    createSession(surface)
+                }
             }
         }
 

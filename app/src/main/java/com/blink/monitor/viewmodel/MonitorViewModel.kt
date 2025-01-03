@@ -1,10 +1,12 @@
 package com.blink.monitor.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blink.monitor.BLRTCServerSession
 import com.blink.monitor.OnMessageListener
+import com.blink.monitor.printCommand
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,7 +47,7 @@ class MonitorViewModel : ViewModel() {
                     }
                 }
             }
-            createSession()
+//            createSession()
         }
     }
 
@@ -86,6 +88,7 @@ class MonitorViewModel : ViewModel() {
     }
 
     fun sendControlMsg(msgType: Int, msg: ByteArray? = null) {
+        Log.d("MonitorViewModel", "sendControlMsg: ${printCommand(msgType)}, $msg")
         BLRTCServerSession.sendMessage(msg, msgType)
     }
 

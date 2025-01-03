@@ -94,7 +94,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ip_address" />
 
-    <SurfaceView
+    <TextureView
         android:id="@+id/surfaceView"
         android:layout_width="100dp"
         android:layout_height="100dp"

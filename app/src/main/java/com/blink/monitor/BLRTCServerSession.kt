@@ -13,7 +13,7 @@ object BLRTCServerSession {
         System.loadLibrary("server")
     }
 
-    fun createSession() {
+    fun createSession(surface :Surface) {
         if (nativeHandle != 0L) {
             return
         }
@@ -47,7 +47,7 @@ object BLRTCServerSession {
                 onMessageListener?.onPeerMessage(client, msgType, msg)
             }
         })
-        startSession()
+        startSession(surface)
     }
 
     fun destroySession() {
@@ -57,7 +57,7 @@ object BLRTCServerSession {
         }
     }
 
-    private external fun startSession(nativeHandle: Long = this.nativeHandle)
+    private external fun startSession(surfaceView: Surface, nativeHandle: Long = this.nativeHandle)
     external fun connectPeerSession(peerIp: String?, nativeHandle: Long = this.nativeHandle)
     external fun stopSession(nativeHandle: Long = this.nativeHandle)
     external fun sendMessage(
