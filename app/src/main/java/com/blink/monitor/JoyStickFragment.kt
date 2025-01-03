@@ -1,6 +1,7 @@
 package com.blink.monitor
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,12 +20,17 @@ class JoyStickFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 JoystickView(180f) {
+                    Log.d("JoyStick", "${it.name}")
                     when (it) {
                         JoystickDirection.Up -> {}
                         JoystickDirection.Down -> {}
                         JoystickDirection.Left -> {}
                         JoystickDirection.Right -> {}
                         JoystickDirection.Release -> {}
+                        JoystickDirection.UpTap -> {}
+                        JoystickDirection.DownTap -> {}
+                        JoystickDirection.LeftTap -> {}
+                        JoystickDirection.RightTap -> {}
                     }
                 }
             }

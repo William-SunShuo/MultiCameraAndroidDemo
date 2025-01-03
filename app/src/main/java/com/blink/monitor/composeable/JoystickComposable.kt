@@ -3,7 +3,9 @@ package com.blink.monitor.composeable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blink.monitor.R
 import com.blink.monitor.extention.JoystickDirection
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 
 @Composable
@@ -43,86 +46,92 @@ fun JoystickView(outerRadius: Float, onDirectionChange: (JoystickDirection) -> U
             Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectDragGestures(onDrag = { change, dragAmount ->
-                        change.consume() // 消耗手势事件
-                        val newOffset = dragOffset + dragAmount
+                    detectDragGestures(
+                        onDrag = { change, dragAmount ->
+                            change.consume() // 消耗手势事件
+                            val newOffset = dragOffset + dragAmount
 
-                        if (newOffset.getDistance() <= size.width / 2 - size.width / 6) {
-                            dragOffset = newOffset
+                            if (newOffset.getDistance() <= size.width / 2 - size.width / 6 - 24f.dp.toPx()) {
+                                dragOffset = newOffset
 
-                            // 判断滑动方向
-                            val xAbs = abs(dragOffset.x)
-                            val yAbs = abs(dragOffset.y)
+                                // 判断滑动方向
+                                val xAbs = abs(dragOffset.x)
+                                val yAbs = abs(dragOffset.y)
 
-                            val direction = when {
-                                xAbs > yAbs && dragOffset.x > 0 -> JoystickDirection.Right
-                                xAbs > yAbs && dragOffset.x < 0 -> JoystickDirection.Left
-                                yAbs > xAbs && dragOffset.y > 0 -> JoystickDirection.Down
-                                yAbs > xAbs && dragOffset.y < 0 -> JoystickDirection.Up
-                                else -> null
+                                val direction = when {
+                                    xAbs > yAbs && dragOffset.x > 0 -> JoystickDirection.Right
+                                    xAbs > yAbs && dragOffset.x < 0 -> JoystickDirection.Left
+                                    yAbs > xAbs && dragOffset.y > 0 -> JoystickDirection.Down
+                                    yAbs > xAbs && dragOffset.y < 0 -> JoystickDirection.Up
+                                    else -> null
+                                }
+
+                                direction?.let {
+                                    currentDirection = it
+                                    onDirectionChange(it)
+                                }
                             }
-
-                            direction?.let {
-                                currentDirection = it
-                                onDirectionChange(it)
-                            }
-                        }
-                    }, onDragEnd = {
-                        // 手势结束时将圆点恢复到中心
-                        dragOffset = Offset.Zero
-                        currentDirection = JoystickDirection.Release
-                        onDirectionChange(JoystickDirection.Release)
-                    }, onDragCancel = {
-                        // 手势结束时将圆点恢复到中心
-                        dragOffset = Offset.Zero
-                        currentDirection = JoystickDirection.Release
-                        onDirectionChange(JoystickDirection.Release)
-                    })
-                }) {
+                        },
+                        onDragEnd = {
+                            // 手势结束时将圆点恢复到中心
+                            dragOffset = Offset.Zero
+                            currentDirection = JoystickDirection.Release
+                            onDirectionChange(JoystickDirection.Release)
+                        },
+                        onDragCancel = {
+                            // 手势结束时将圆点恢复到中心
+                            dragOffset = Offset.Zero
+                            currentDirection = JoystickDirection.Release
+                            onDirectionChange(JoystickDirection.Release)
+                        },
+                    )
+                }
+        ) {
             drawJoystick(dragOffset)
         }
-        Image(//上
-            painter = painterResource(
-                if (currentDirection == JoystickDirection.Up) R.drawable.ic_direction_arrow_solid else R.drawable.ic_direction_arrow_opacity
-            ), "",
-            Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 20f.dp)
-                .size(24f.dp, 12f.dp)
+        //上
+        ArrowClickable(
+            onSelect = currentDirection == JoystickDirection.Up,
+            direction = JoystickDirection.Up,
+            {
+                onDirectionChange(JoystickDirection.UpTap)
+                currentDirection = JoystickDirection.Up
+            }, {
+                currentDirection = JoystickDirection.Release
+            }
         )
-        Image(//左
-            painter = painterResource(
-                if (currentDirection == JoystickDirection.Left) R.drawable.ic_direction_arrow_solid else R.drawable.ic_direction_arrow_opacity
-            ),
-            "",
-            Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 20f.dp)
-                .size(24f.dp, 12f.dp)
-                .rotate(270f)
+        //下
+        ArrowClickable(
+            onSelect = currentDirection == JoystickDirection.Down,
+            direction = JoystickDirection.Down,
+            {
+                onDirectionChange(JoystickDirection.DownTap)
+                currentDirection = JoystickDirection.Down
+            }, {
+                currentDirection = JoystickDirection.Release
+            }
         )
-        Image(//右
-            painter = painterResource(
-                if (currentDirection == JoystickDirection.Right) R.drawable.ic_direction_arrow_solid else R.drawable.ic_direction_arrow_opacity
-            ),
-            "",
-            Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 20f.dp)
-                .size(24f.dp, 12f.dp)
-                .rotate(90f)
-
+        //左
+        ArrowClickable(
+            onSelect = currentDirection == JoystickDirection.Left,
+            direction = JoystickDirection.Left,
+            {
+                onDirectionChange(JoystickDirection.LeftTap)
+                currentDirection = JoystickDirection.Left
+            }, {
+                currentDirection = JoystickDirection.Release
+            }
         )
-        Image(//下
-            painter = painterResource(
-                if (currentDirection == JoystickDirection.Down) R.drawable.ic_direction_arrow_solid else R.drawable.ic_direction_arrow_opacity
-            ),
-            "",
-            Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 20f.dp)
-                .size(24f.dp, 12f.dp)
-                .rotate(180f)
+        //右
+        ArrowClickable(
+            onSelect = currentDirection == JoystickDirection.Right,
+            direction = JoystickDirection.Right,
+            {
+                onDirectionChange(JoystickDirection.RightTap)
+                currentDirection = JoystickDirection.Right
+            }, {
+                currentDirection = JoystickDirection.Release
+            }
         )
     }
 }
@@ -152,6 +161,75 @@ private fun DrawScope.drawJoystick(
 
 @Preview
 @Composable
-private fun preview() {
-    JoystickView(160f, {})
+private fun Preview() {
+    JoystickView(160f) {}
+}
+
+@Composable
+private fun BoxScope.ArrowClickable(
+    onSelect: Boolean,
+    direction: JoystickDirection,
+    onTap: () -> Unit,
+    onTapUp: () -> Unit,
+) {
+    val (rotate, alignment) = when (direction) {
+        JoystickDirection.Up -> {
+            (0f to Alignment.TopCenter)
+        }
+
+        JoystickDirection.Down -> {
+            (180f to Alignment.BottomCenter)
+        }
+
+        JoystickDirection.Left -> {
+            (270f to Alignment.CenterStart)
+        }
+
+        JoystickDirection.Right -> {
+            (90f to Alignment.CenterEnd)
+        }
+
+        else -> {
+            (0f to Alignment.TopCenter)
+        }
+    }
+    Box(
+        Modifier
+            .align(alignment)
+            .size(40f.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        try {
+                            onTap()
+                            awaitRelease()
+                            onTapUp()
+                        } catch (e: CancellationException) {
+                            // 如果手势被取消
+                            println("Gesture was cancelled")
+                            onTapUp()
+
+                        }
+
+                    }
+                )
+            }
+    ) {
+
+        Image(
+            painter = painterResource(
+                if (onSelect) R.drawable.ic_direction_arrow_solid else R.drawable.ic_direction_arrow_opacity
+            ),
+            "",
+            Modifier
+                .align(alignment)
+                .padding(top = if (direction == JoystickDirection.Up) 20f.dp else 0.dp)
+                .padding(bottom = if (direction == JoystickDirection.Down) 20f.dp else 0.dp)
+                .padding(start = if (direction == JoystickDirection.Left) 15f.dp else 0.dp)
+                .padding(end = if (direction == JoystickDirection.Right) 15f.dp else 0.dp)
+                .size(24f.dp, 12f.dp)
+                .rotate(rotate)
+
+        )
+    }
 }
