@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@android:color/darker_gray"
     android:clipChildren="false"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -21,14 +20,30 @@
         android:layout_marginHorizontal="9dp"
         android:layout_marginBottom="5dp"/>
 
-    <ImageView
-        android:id="@+id/plate_cursor"
+
+    <FrameLayout
+        android:id="@+id/cursor_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/iv_plate_cursor"
-        tools:ignore="ContentDescription" />
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/plate_cursor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/iv_plate_cursor"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/cover"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/iv_cursor_bg"
+            tools:ignore="ContentDescription"
+            />
+
+    </FrameLayout>
+
 
 
     <com.blink.monitor.view.ColorSeekBar
@@ -39,7 +54,7 @@
         app:layout_constraintEnd_toEndOf="@id/plate"
         app:layout_constraintTop_toBottomOf="@id/plate"
         app:cornerRadius="3dp"
-        android:layout_marginVertical="16dp"
+        android:layout_marginTop="16dp"
         app:barHeight="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         />

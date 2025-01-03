@@ -52,7 +52,6 @@ class PlateView @JvmOverloads constructor(context: Context,
                     if(y < 0) y = 0f
                     //设置v向量值；代表颜色明暗
                     hsvSelected[1] = 1f - (1.0f / measuredHeight * y)
-
                     locationCursor(x, y, hsvSelected)
                 }
             }
@@ -64,7 +63,7 @@ class PlateView @JvmOverloads constructor(context: Context,
 
     //初次进来落点在;
     fun middleState() {
-        locationCursor(measuredWidth.toFloat()/2f , measuredHeight.toFloat() /2f, floatArrayOf(0.5f, 0.5f))
+        locationCursor(measuredWidth.toFloat() , measuredHeight.toFloat(), floatArrayOf(1f, 1f))
     }
 
     //定位对应的图片控件位置.
