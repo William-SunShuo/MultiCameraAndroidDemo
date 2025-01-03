@@ -22,7 +22,7 @@
         android:theme="@style/Theme.MultiCameraDemo"
         tools:targetApi="31">
         <activity
-            android:name=".MonitorActivity"
+            android:name=".MainActivity"
             android:screenOrientation="landscape"
             android:exported="true">
             <intent-filter>

@@ -94,13 +94,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ip_address" />
 
-    <ImageView
-        android:id="@+id/imageView"
+    <SurfaceView
+        android:id="@+id/surfaceView"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="#ccc"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/status"/>
 

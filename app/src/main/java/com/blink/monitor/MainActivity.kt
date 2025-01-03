@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                     override fun onDecodedFrame(pixelBuffer: ByteArray?) {
                         Log.d("Native", "pixelBuffer size:${pixelBuffer?.size}")
                         if (pixelBuffer != null) {
-                            handleDecodedData(pixelBuffer)
+//                            handleDecodedData(pixelBuffer)
                         }
                     }
 
@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 createSession()
+                setSurface(binding.surfaceView.holder.surface)
             }
         }
 
@@ -114,19 +115,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun handleDecodedData(decodedData: ByteArray) {
-        lifecycleScope.launch {
-            // 直接使用解码后的数据，避免额外的内存复制
-            val yuvImage = YuvImage(decodedData, ImageFormat.NV21, 1280, 720, null) // 根据你的 YUV 格式调整
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            yuvImage.compressToJpeg(Rect(0, 0, 1280, 720), 100, byteArrayOutputStream)
-            val imageBytes = byteArrayOutputStream.toByteArray()
-
-            // 转换为 Bitmap
-            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-            binding.imageView.setImageBitmap(bitmap)
-        }
-    }
+//    fun handleDecodedData(decodedData: ByteArray) {
+//        lifecycleScope.launch {
+//            // 直接使用解码后的数据，避免额外的内存复制
+//            val yuvImage = YuvImage(decodedData, ImageFormat.NV21, 1280, 720, null) // 根据你的 YUV 格式调整
+//            val byteArrayOutputStream = ByteArrayOutputStream()
+//            yuvImage.compressToJpeg(Rect(0, 0, 1280, 720), 100, byteArrayOutputStream)
+//            val imageBytes = byteArrayOutputStream.toByteArray()
+//
+//            // 转换为 Bitmap
+//            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+//            binding.imageView.setImageBitmap(bitmap)
+//        }
+//    }
 
     override fun onDestroy() {
         super.onDestroy()
