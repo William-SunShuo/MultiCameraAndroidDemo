@@ -16,7 +16,7 @@ inline BLRTCServerSession* getNativeHandle(jlong handle) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_blink_monitor_BLRTCServerSession_startSession(JNIEnv *env, jobject thiz,jobject surface, jlong handle) {
+Java_com_blink_monitor_BLRTCServerSession_startSession(JNIEnv *env, jobject thiz,jlong handle) {
     auto* session = getNativeHandle(handle);
     if (session) {
         session->startSession();
@@ -96,7 +96,7 @@ public:
     JavaBLRTCServerSessionListener(JNIEnv* env, jobject listenerObj)
             : listenerGlobalRef(env->NewGlobalRef(listenerObj)) {
         jclass cls = env->GetObjectClass(listenerObj);
-        onPeerAddressMethod = env->GetMethodID(cls, "onPeerAddress", "(Ljava/lang/String;Ljava/lang/String;I)V");
+        onPeerAddressMethod = env->GetMethodID(cls, "onPeerAddress", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
         onPeerConnectStatusMethod = env->GetMethodID(cls, "onPeerConnectStatus", "(Ljava/lang/String;I)V");
         onDecodedFrameMethod = env->GetMethodID(cls, "onDecodedFrame", "([B)V");
         onPeerMessageMethod = env->GetMethodID(cls, "onPeerMessage", "(Ljava/lang/String;I[B)V");
@@ -113,10 +113,16 @@ public:
         JNIEnv *env = getJNIEnv();
         jstring jIpAddress = env->NewStringUTF(client.ip.c_str());
         jstring jDeviceName = env->NewStringUTF(client.name.c_str());
-        jint jDeviceType = client.device_type;
-        env->CallVoidMethod(listenerGlobalRef, onPeerAddressMethod, jIpAddress, jDeviceName);
+        jstring jDeviceType;
+        if (client.device_type.empty() && !client.device_type.empty()) {
+            jDeviceType = env->NewStringUTF(client.device_type.c_str());
+        } else {
+            jDeviceType = env->NewStringUTF("0");
+        }
+        env->CallVoidMethod(listenerGlobalRef, onPeerAddressMethod, jIpAddress, jDeviceName, jDeviceType);
         env->DeleteLocalRef(jIpAddress);
         env->DeleteLocalRef(jDeviceName);
+        env->DeleteLocalRef(jDeviceType);
     }
 
     void onPeerConnectStatus(BLNSPClient &client, int status) override {

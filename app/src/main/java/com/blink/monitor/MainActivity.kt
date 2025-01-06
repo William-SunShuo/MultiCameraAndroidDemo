@@ -49,14 +49,14 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 })
-                startPeerConnection(Build.MANUFACTURER)
+                startPeerConnection(Build.MANUFACTURER, "3")
             }
         }
 
         binding.startMonitor.setOnClickListener{
             BLRTCServerSession.apply {
                 onConnectListener = object:OnConnectListener{
-                    override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: Int) {
+                    override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
                         Log.d("Native", "Peer Address: $ipAddress, Device: $deviceName,deviceType: $deviceType, thread: ${Thread.currentThread().name}")
                         ip = ipAddress
                         lifecycleScope.launch(Dispatchers.Main) {
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                     override fun onDecodedFrame(pixelBuffer: ByteArray?) {
                         Log.d("Native", "pixelBuffer size:${pixelBuffer?.size}")
                         if (pixelBuffer != null) {
-//                            handleDecodedData(pixelBuffer)
+                            handleDecodedData(pixelBuffer)
                         }
                     }
 
@@ -85,12 +85,12 @@ class MainActivity : AppCompatActivity() {
                     }
 
                 }
-
-                binding.surfaceView.surfaceTexture?.let {
-                    val surface = Surface(it)
-//                    setSurface(surface)
-                    createSession()
-                }
+                createSession()
+//                binding.surfaceView.surfaceTexture?.let {
+//                    val surface = Surface(it)
+////                    setSurface(surface)
+//                    createSession()
+//                }
             }
         }
 
@@ -119,19 +119,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    fun handleDecodedData(decodedData: ByteArray) {
-//        lifecycleScope.launch {
-//            // 直接使用解码后的数据，避免额外的内存复制
-//            val yuvImage = YuvImage(decodedData, ImageFormat.NV21, 1280, 720, null) // 根据你的 YUV 格式调整
-//            val byteArrayOutputStream = ByteArrayOutputStream()
-//            yuvImage.compressToJpeg(Rect(0, 0, 1280, 720), 100, byteArrayOutputStream)
-//            val imageBytes = byteArrayOutputStream.toByteArray()
-//
-//            // 转换为 Bitmap
-//            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-//            binding.imageView.setImageBitmap(bitmap)
-//        }
-//    }
+    fun handleDecodedData(decodedData: ByteArray) {
+        lifecycleScope.launch {
+            // 直接使用解码后的数据，避免额外的内存复制
+            val yuvImage = YuvImage(decodedData, ImageFormat.NV21, 1280, 720, null) // 根据你的 YUV 格式调整
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            yuvImage.compressToJpeg(Rect(0, 0, 1280, 720), 100, byteArrayOutputStream)
+            val imageBytes = byteArrayOutputStream.toByteArray()
+
+            // 转换为 Bitmap
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            binding.imageView.setImageBitmap(bitmap)
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()

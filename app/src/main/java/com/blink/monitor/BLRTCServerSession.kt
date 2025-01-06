@@ -19,7 +19,7 @@ object BLRTCServerSession {
         }
         nativeHandle = nativeCreate()
         addListener(object : BLRTCServerSessionListener {
-            override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: Int) {
+            override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
                 onConnectListener?.onPeerAddress(ipAddress, deviceName, deviceType)
             }
 
@@ -37,7 +37,7 @@ object BLRTCServerSession {
                 onMessageListener?.onPeerMessage(client, msgType, msg)
             }
         })
-        startSession(null)
+        startSession()
     }
 
     fun destroySession() {
@@ -47,7 +47,7 @@ object BLRTCServerSession {
         }
     }
 
-    private external fun startSession(surfaceView: Surface?, nativeHandle: Long = this.nativeHandle)
+    private external fun startSession(nativeHandle: Long = this.nativeHandle)
     external fun connectPeerSession(peerIp: String?, nativeHandle: Long = this.nativeHandle)
     external fun stopSession(nativeHandle: Long = this.nativeHandle)
     external fun sendMessage(
@@ -65,7 +65,7 @@ object BLRTCServerSession {
 }
 
 interface OnConnectListener {
-    fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: Int)
+    fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String)
     fun onPeerConnectStatus(ipAddress: String, status: Int)
 }
 
