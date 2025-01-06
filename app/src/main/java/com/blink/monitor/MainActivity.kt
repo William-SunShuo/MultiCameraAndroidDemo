@@ -54,19 +54,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.startMonitor.setOnClickListener{
-//            BLRTCServerSession.createSession()
             BLRTCServerSession.apply {
                 onConnectListener = object:OnConnectListener{
-                    override fun onPeerAddress(ipAddress: String?, deviceName: String?) {
-                        Log.d("Native", "Peer Address: $ipAddress, Device: $deviceName, thread: ${Thread.currentThread().name}")
+                    override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: Int) {
+                        Log.d("Native", "Peer Address: $ipAddress, Device: $deviceName,deviceType: $deviceType, thread: ${Thread.currentThread().name}")
                         ip = ipAddress
                         lifecycleScope.launch(Dispatchers.Main) {
                             binding.ipAddress.text = "Ip Address: $ipAddress"
                         }
                     }
 
-                    override fun onPeerConnectStatus(client: String?, status: Int) {
-                        Log.d("Native", "Client: $client, Status: $status, thread: ${Thread.currentThread().name}")
+                    override fun onPeerConnectStatus(ipAddress: String, status: Int) {
+                        Log.d("Native", "Client: $ipAddress, Status: $status, thread: ${Thread.currentThread().name}")
                         lifecycleScope.launch(Dispatchers.Main) {
                             binding.status.text = "status: $status"
                         }
@@ -90,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                 binding.surfaceView.surfaceTexture?.let {
                     val surface = Surface(it)
 //                    setSurface(surface)
-                    createSession(surface)
+                    createSession()
                 }
             }
         }
