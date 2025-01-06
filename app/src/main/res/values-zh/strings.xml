@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MultiCameraDemo</string>
+
+    <string name="searching_near">正在搜索附近的设备...</string>
+    <string name="device_network_tips">两台设备需要处于同一个网路中</string>
+
+</resources>

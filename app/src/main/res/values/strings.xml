@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MultiCameraDemo</string>
+
+    <string name="searching_near">正在搜索附近的设备</string>
+    <string name="device_network_tips">Two mobile devices need to connect to the same network</string>
+    <string name="jump_network_settings">Settings > Network</string>
+    <string name="cap_device">Capture Devices</string>
+
 </resources>

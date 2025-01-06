@@ -23,8 +23,8 @@
         android:theme="@style/Theme.MultiCameraDemo"
         tools:targetApi="31">
         <activity
-            android:name=".MonitorActivity"
-            android:screenOrientation="userLandscape"
+            android:name=".MonitorCaptureDevicesActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

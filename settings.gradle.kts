@@ -1,3 +1,5 @@
+import java.net.URI
+
 pluginManagement {
     repositories {
         google {
@@ -9,6 +11,12 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven {
+            setUrl( "https://maven.aliyun.com/repository/google")
+        }
+        maven {setUrl("https://maven.aliyun.com/repository/jcenter") }
+        maven { setUrl("https://maven.aliyun.com/repository/public") }
+
     }
 }
 dependencyResolutionManagement {
@@ -16,6 +24,13 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            setUrl( "https://maven.aliyun.com/repository/google")
+        }
+        maven {setUrl("https://maven.aliyun.com/repository/jcenter") }
+        maven { setUrl("https://maven.aliyun.com/repository/public") }
+        maven { setUrl( "https://jitpack.io") }
+
     }
 }
 
