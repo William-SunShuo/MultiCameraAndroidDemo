@@ -192,6 +192,16 @@
         app:layout_constraintRight_toRightOf="@id/cameraView" />
 
     <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_score"
+        android:layout_width="500dp"
+        android:layout_height="351dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bt_home"
+        android:layout_marginStart="26dp"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/compose_joystick_container"
         android:layout_width="180dp"
         android:layout_height="180dp"

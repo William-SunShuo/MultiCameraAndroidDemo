@@ -171,7 +171,9 @@ class ColorSeekBar(context: Context, attributeSet: AttributeSet): View(context, 
                     thumbX = it
                     invalidate()
                 }
-                colorChangeListener?.colorChange(getColor())
+                post {
+                    colorChangeListener?.colorChange(getColor())
+                }
             }
 
         }

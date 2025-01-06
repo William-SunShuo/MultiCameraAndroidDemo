@@ -28,6 +28,10 @@ class MonitorViewModel : ViewModel() {
     private val _isShowJoystick = MutableLiveData(false)
     val isShowJoystick = _isShowJoystick
 
+    var isShowScorePanel = MutableLiveData(false)
+
+
+
     init {
         BLRTCServerSession.run {
             onMessageListener = object : OnMessageListener {
@@ -53,6 +57,10 @@ class MonitorViewModel : ViewModel() {
 
     fun toggleJoystick(boolean: Boolean) {
         _isShowJoystick.value = boolean
+    }
+
+    fun showScorePanel(state: Boolean) {
+        isShowScorePanel.value = state
     }
 
     fun startTimer() {

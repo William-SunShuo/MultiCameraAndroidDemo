@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.blink.monitor.databinding.ActivityMonitorBinding
 import com.blink.monitor.extention.dp
+import com.blink.monitor.fragment.ScorePanelFragment
 import com.blink.monitor.viewmodel.MonitorViewModel
 import com.blink.monitor.window.ScoreboardWindow
 import kotlinx.coroutines.flow.collectLatest
@@ -77,6 +78,10 @@ class MonitorActivity : AppCompatActivity() {
             binding.composeJoystickContainer.visibility = if (it) View.VISIBLE else View.GONE
         }
 
+        viewModel.isShowScorePanel.observe(this) {
+            binding.fragmentScore.visibility = if(it) View.VISIBLE else View.GONE
+        }
+
         // 监听时间更新
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -88,6 +93,10 @@ class MonitorActivity : AppCompatActivity() {
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.compose_joystick_container, JoyStickFragment())
+            .commit()
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_score, ScorePanelFragment())
             .commit()
     }
 
@@ -106,24 +115,18 @@ class MonitorActivity : AppCompatActivity() {
                 systemUiVisibility =
                     (View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
             }
+
+            post {
+                binding.cameraView.apply {
+                    Log.d("size", "width:${this.width}, height:${height}")
+                }
+            }
         }
+
     }
 
     private fun toggleScoreBoard(view: View, showScoreBoard: Boolean) {
-//        if (showScoreBoard) {
-//            scorePopUp = ScoreboardWindow(this)
-//            val location = intArrayOf(0, 0)
-//            view.getLocationOnScreen(location)
-//            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
-//            scorePopUp?.showAtLocation(
-//                view, Gravity.NO_GRAVITY, location[0] + 17.dp.toInt(),
-//                (screenHeight / 2 - 320.dp / 2).toInt()
-//            )
-//        } else {
-//            scorePopUp?.dismiss()
-//        }
-
-
+        viewModel.showScorePanel(showScoreBoard)
     }
 
     private fun toggleDirection(showDirection: Boolean) {
