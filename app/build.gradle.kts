@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.coroutines)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui)

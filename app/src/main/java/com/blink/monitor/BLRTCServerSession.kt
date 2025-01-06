@@ -13,32 +13,22 @@ object BLRTCServerSession {
         System.loadLibrary("server")
     }
 
-    fun createSession(surface :Surface) {
+    fun createSession() {
         if (nativeHandle != 0L) {
             return
         }
         nativeHandle = nativeCreate()
         addListener(object : BLRTCServerSessionListener {
-            override fun onPeerAddress(ipAddress: String?, deviceName: String?) {
-                Log.d(
-                    "Native",
-                    "Peer Address: $ipAddress, Device: $deviceName, thread: ${Thread.currentThread().name}"
-                )
-                connectedIp = ipAddress
-                onConnectListener?.onPeerAddress(ipAddress, deviceName)
+            override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
+                onConnectListener?.onPeerAddress(ipAddress, deviceName, deviceType)
             }
 
-            override fun onPeerConnectStatus(client: String?, status: Int) {
-                Log.d(
-                    "Native",
-                    "Client: $client, Status: $status, thread: ${Thread.currentThread().name}"
-                )
-//                connectedIp = if (status == 1) client else null
-                onConnectListener?.onPeerConnectStatus(client, status)
+            override fun onPeerConnectStatus(ipAddress: String, status: Int) {
+                connectedIp = if (status == 1) ipAddress else null
+                onConnectListener?.onPeerConnectStatus(ipAddress, status)
             }
 
             override fun onDecodedFrame(pixelBuffer: ByteArray?) {
-                Log.d("Native", "Decoded Frame Size: " + pixelBuffer!!.size)
                 onMessageListener?.onDecodedFrame(pixelBuffer)
             }
 
@@ -47,7 +37,7 @@ object BLRTCServerSession {
                 onMessageListener?.onPeerMessage(client, msgType, msg)
             }
         })
-        startSession(surface)
+        startSession()
     }
 
     fun destroySession() {
@@ -57,7 +47,7 @@ object BLRTCServerSession {
         }
     }
 
-    private external fun startSession(surfaceView: Surface, nativeHandle: Long = this.nativeHandle)
+    private external fun startSession(nativeHandle: Long = this.nativeHandle)
     external fun connectPeerSession(peerIp: String?, nativeHandle: Long = this.nativeHandle)
     external fun stopSession(nativeHandle: Long = this.nativeHandle)
     external fun sendMessage(
@@ -69,21 +59,19 @@ object BLRTCServerSession {
         listener: BLRTCServerSessionListener?, nativeHandle: Long = this.nativeHandle
     )
 
-    external fun setSurface(surfaceView: Surface, nativeHandle: Long = this.nativeHandle): String
-
     private external fun nativeCreate(): Long
     private external fun nativeDestroy(nativeHandle: Long)
 
 }
 
 interface OnConnectListener {
-    fun onPeerAddress(ipAddress: String?, deviceName: String?)
-    fun onPeerConnectStatus(client: String?, status: Int)
+    fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String)
+    fun onPeerConnectStatus(ipAddress: String, status: Int)
 }
 
 interface OnMessageListener {
     fun onDecodedFrame(pixelBuffer: ByteArray?)
-    fun onPeerMessage(client: String?, msgType: Int, msg: ByteArray?)
+    fun onPeerMessage(ipAddress: String?, msgType: Int, msg: ByteArray?)
 }
 
 // 定义监听器接口

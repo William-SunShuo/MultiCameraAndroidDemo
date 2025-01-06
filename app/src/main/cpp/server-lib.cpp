@@ -1,5 +1,6 @@
 #include <jni.h>
 #include "BLRTCServerSession.hpp"
+#include "BLNSPServer.hpp"
 #include "LogcatBuffer.hpp"
 #include <android/log.h>
 #define  LOG_TAG    "Native"
@@ -15,12 +16,12 @@ inline BLRTCServerSession* getNativeHandle(jlong handle) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_blink_monitor_BLRTCServerSession_startSession(JNIEnv *env, jobject thiz,jobject surface, jlong handle) {
+Java_com_blink_monitor_BLRTCServerSession_startSession(JNIEnv *env, jobject thiz,jlong handle) {
     auto* session = getNativeHandle(handle);
     if (session) {
         session->startSession();
-        ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
-        session->setSurface(nativeWindow);
+//        ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
+//        session->setSurface(nativeWindow);
     }
 }
 extern "C"
@@ -55,22 +56,22 @@ Java_com_blink_monitor_BLRTCServerSession_sendMessage(JNIEnv *env, jobject thiz,
         const char *clientIpStr = env->GetStringUTFChars(clientIp, nullptr);
         std::string client(clientIpStr);
         char buffer[1024];
-        NSPMessage nspMessage;
-        nspMessage.msgType = static_cast<NSPMessageType>(msgType);
-        // 获取 jbyteArray 的长度
-        jsize length = env->GetArrayLength(msg);
-        // 分配本地缓冲区
-        char *msgBuffer = new char[length + 1]; // +1 是为了容纳 '\0'
-        // 将 jbyteArray 内容拷贝到本地缓冲区
-        env->GetByteArrayRegion(msg, 0, length, reinterpret_cast<jbyte *>(msgBuffer));
-        // 确保字符串以 '\0' 结尾
-        msgBuffer[length] = '\0';
-        std::strcpy(nspMessage.data, msgBuffer);
-        nspMessage.setLength();
-        nspMessage.packet(buffer);
-        session->sendMessage(&nspMessage, client);
-        env->ReleaseStringUTFChars(clientIp, clientIpStr);
-        delete[] msgBuffer;
+//        NSPMessage nspMessage;
+//        nspMessage.msgType = static_cast<NSPMessageType>(msgType);
+//        // 获取 jbyteArray 的长度
+//        jsize length = env->GetArrayLength(msg);
+//        // 分配本地缓冲区
+//        char *msgBuffer = new char[length + 1]; // +1 是为了容纳 '\0'
+//        // 将 jbyteArray 内容拷贝到本地缓冲区
+//        env->GetByteArrayRegion(msg, 0, length, reinterpret_cast<jbyte *>(msgBuffer));
+//        // 确保字符串以 '\0' 结尾
+//        msgBuffer[length] = '\0';
+//        std::strcpy(nspMessage.data, msgBuffer);
+//        nspMessage.setLength();
+//        nspMessage.packet(buffer);
+//        session->sendMessage(&nspMessage, client);
+//        env->ReleaseStringUTFChars(clientIp, clientIpStr);
+//        delete[] msgBuffer;
     }
 }
 extern "C"
@@ -95,7 +96,7 @@ public:
     JavaBLRTCServerSessionListener(JNIEnv* env, jobject listenerObj)
             : listenerGlobalRef(env->NewGlobalRef(listenerObj)) {
         jclass cls = env->GetObjectClass(listenerObj);
-        onPeerAddressMethod = env->GetMethodID(cls, "onPeerAddress", "(Ljava/lang/String;Ljava/lang/String;)V");
+        onPeerAddressMethod = env->GetMethodID(cls, "onPeerAddress", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
         onPeerConnectStatusMethod = env->GetMethodID(cls, "onPeerConnectStatus", "(Ljava/lang/String;I)V");
         onDecodedFrameMethod = env->GetMethodID(cls, "onDecodedFrame", "([B)V");
         onPeerMessageMethod = env->GetMethodID(cls, "onPeerMessage", "(Ljava/lang/String;I[B)V");
@@ -108,20 +109,27 @@ public:
         }
     }
 
-    void onPeerAddress(std::string& ipAddress, std::string& deviceName) override {
-        JNIEnv* env = getJNIEnv();
-        jstring jIpAddress = env->NewStringUTF(ipAddress.c_str());
-        jstring jDeviceName = env->NewStringUTF(deviceName.c_str());
-        env->CallVoidMethod(listenerGlobalRef, onPeerAddressMethod, jIpAddress, jDeviceName);
+    void onPeerDevicesRefresh(BLNSPClient &client) override {
+        JNIEnv *env = getJNIEnv();
+        jstring jIpAddress = env->NewStringUTF(client.ip.c_str());
+        jstring jDeviceName = env->NewStringUTF(client.name.c_str());
+        jstring jDeviceType;
+        if (client.device_type.empty() && !client.device_type.empty()) {
+            jDeviceType = env->NewStringUTF(client.device_type.c_str());
+        } else {
+            jDeviceType = env->NewStringUTF("0");
+        }
+        env->CallVoidMethod(listenerGlobalRef, onPeerAddressMethod, jIpAddress, jDeviceName, jDeviceType);
         env->DeleteLocalRef(jIpAddress);
         env->DeleteLocalRef(jDeviceName);
+        env->DeleteLocalRef(jDeviceType);
     }
 
-    void onPeerConnectStatus(std::string& client, int status) override {
-        JNIEnv* env = getJNIEnv();
-        jstring jClient = env->NewStringUTF(client.c_str());
-        env->CallVoidMethod(listenerGlobalRef, onPeerConnectStatusMethod, jClient, status);
-        env->DeleteLocalRef(jClient);
+    void onPeerConnectStatus(BLNSPClient &client, int status) override {
+        JNIEnv *env = getJNIEnv();
+        jstring jIpAddress = env->NewStringUTF(client.ip.c_str());
+        env->CallVoidMethod(listenerGlobalRef, onPeerConnectStatusMethod, jIpAddress, status);
+        env->DeleteLocalRef(jIpAddress);
     }
 
     void onDecodedFrame(const std::vector<uint8_t>& pixelBuffer) override {
@@ -132,19 +140,19 @@ public:
         env->DeleteLocalRef(jPixelBuffer);
     }
 
-    void onPeerMessage(BLNSPClient& client,NSPMessage& message) override {
+    void onPeerMessage(BLNSPClient& client,const MQTTMessage& message) override {
         JNIEnv* env = getJNIEnv();
         // 提取 msgType
-        jint msgType = static_cast<jint>(message.msgType);
-        // 创建 byte[] (jbyteArray) 并填充数据
-        jbyteArray byteArray = env->NewByteArray(message.length);
-        if (byteArray) {
-            env->SetByteArrayRegion(byteArray, 0, message.length, reinterpret_cast<jbyte*>(message.data));
-        }
+//        jint msgType = static_cast<jint>(message.msgType);
+//        // 创建 byte[] (jbyteArray) 并填充数据
+//        jbyteArray byteArray = env->NewByteArray(message.length);
+//        if (byteArray) {
+//            env->SetByteArrayRegion(byteArray, 0, message.length, reinterpret_cast<jbyte*>(message.data));
+//        }
         // 调用 Java 回调方法
-        env->CallVoidMethod(listenerGlobalRef, onPeerMessageMethod, msgType, byteArray);
-        // 释放本地引用
-        if (byteArray) env->DeleteLocalRef(byteArray);
+//        env->CallVoidMethod(listenerGlobalRef, onPeerMessageMethod, msgType, byteArray);
+//        // 释放本地引用
+//        if (byteArray) env->DeleteLocalRef(byteArray);
     }
     static JavaVM* javaVM; // 全局 JavaVM 对象
 private:
@@ -182,21 +190,4 @@ JavaVM* JavaBLRTCServerSessionListener::javaVM = nullptr;
 extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     JavaBLRTCServerSessionListener::javaVM = vm;
     return JNI_VERSION_1_6;
-}
-
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_blink_monitor_BLRTCServerSession_setSurface(JNIEnv *env, jobject thiz,jobject surface, jlong handle) {
-    auto *session = getNativeHandle(handle);
-    LOGI("setSurface");
-    if (session) {
-        ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
-        if (nativeWindow != nullptr) {
-            // 成功获取 ANativeWindow，可以继续使用它
-            session->setSurface(nativeWindow);
-        } else {
-            // 处理错误
-            LOGI("setSurface failed");
-        }
-    }
 }
