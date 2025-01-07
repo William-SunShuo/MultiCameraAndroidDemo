@@ -46,32 +46,24 @@ Java_com_blink_monitor_BLRTCServerSession_stopSession(JNIEnv *env, jobject thiz,
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_blink_monitor_BLRTCServerSession_sendMessage(JNIEnv *env, jobject thiz, jbyteArray msg,jint msgType,
-                                                      jstring clientIp, jlong handle) {
-    auto* session = getNativeHandle(handle);
+Java_com_blink_monitor_BLRTCServerSession_sendMessage(JNIEnv *env, jobject thiz, jstring clientIp,jstring topic, jint payloadlen,jbyteArray payload, jlong handle) {
+    auto *session = getNativeHandle(handle);
     if (session) {
         if (clientIp == nullptr) {
             return;
         }
         const char *clientIpStr = env->GetStringUTFChars(clientIp, nullptr);
         std::string client(clientIpStr);
-        char buffer[1024];
-//        NSPMessage nspMessage;
-//        nspMessage.msgType = static_cast<NSPMessageType>(msgType);
-//        // 获取 jbyteArray 的长度
-//        jsize length = env->GetArrayLength(msg);
-//        // 分配本地缓冲区
-//        char *msgBuffer = new char[length + 1]; // +1 是为了容纳 '\0'
-//        // 将 jbyteArray 内容拷贝到本地缓冲区
-//        env->GetByteArrayRegion(msg, 0, length, reinterpret_cast<jbyte *>(msgBuffer));
-//        // 确保字符串以 '\0' 结尾
-//        msgBuffer[length] = '\0';
-//        std::strcpy(nspMessage.data, msgBuffer);
-//        nspMessage.setLength();
-//        nspMessage.packet(buffer);
-//        session->sendMessage(&nspMessage, client);
-//        env->ReleaseStringUTFChars(clientIp, clientIpStr);
-//        delete[] msgBuffer;
+        env->ReleaseStringUTFChars(clientIp, clientIpStr);  // 释放内存
+        // 获取 topic 字符串
+        const char *topic_cstr = env->GetStringUTFChars(topic, nullptr);
+        // 获取 payload 字节数组
+        jbyte *payload_bytes = env->GetByteArrayElements(payload, nullptr);
+        // 调用 C++ 的 sendPeerMessage 方法
+        session->sendPeerMessage(client, topic_cstr, payloadlen, payload_bytes);
+        // 释放相关内存
+        env->ReleaseStringUTFChars(topic, topic_cstr);
+        env->ReleaseByteArrayElements(payload, payload_bytes, 0); // 释放并可选设置 0 表示没有修改 payload
     }
 }
 extern "C"
@@ -99,7 +91,7 @@ public:
         onPeerAddressMethod = env->GetMethodID(cls, "onPeerAddress", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
         onPeerConnectStatusMethod = env->GetMethodID(cls, "onPeerConnectStatus", "(Ljava/lang/String;I)V");
         onDecodedFrameMethod = env->GetMethodID(cls, "onDecodedFrame", "([B)V");
-        onPeerMessageMethod = env->GetMethodID(cls, "onPeerMessage", "(Ljava/lang/String;I[B)V");
+        onPeerMessageMethod = env->GetMethodID(cls, "onPeerMessage", "(Ljava/lang/String;Ljava/lang/String;[B)V");
     }
 
     ~JavaBLRTCServerSessionListener() {
@@ -142,17 +134,21 @@ public:
 
     void onPeerMessage(BLNSPClient& client,const MQTTMessage& message) override {
         JNIEnv* env = getJNIEnv();
-        // 提取 msgType
-//        jint msgType = static_cast<jint>(message.msgType);
-//        // 创建 byte[] (jbyteArray) 并填充数据
-//        jbyteArray byteArray = env->NewByteArray(message.length);
-//        if (byteArray) {
-//            env->SetByteArrayRegion(byteArray, 0, message.length, reinterpret_cast<jbyte*>(message.data));
-//        }
-        // 调用 Java 回调方法
-//        env->CallVoidMethod(listenerGlobalRef, onPeerMessageMethod, msgType, byteArray);
-//        // 释放本地引用
-//        if (byteArray) env->DeleteLocalRef(byteArray);
+        jstring jIpAddress = env->NewStringUTF(client.ip.c_str());
+
+        // 将 C++ 中的 topic 转换为 jstring
+        jstring topic = env->NewStringUTF(message.topic);  // 将 C++ 的字符串转换为 Java 字符串
+
+        // 将 C++ 中的 payload 转换为 jbyteArray
+        jbyteArray payload = env->NewByteArray(message.payloadlen);  // 创建一个 Java 字节数组
+        env->SetByteArrayRegion(payload, 0, message.payloadlen, reinterpret_cast<const jbyte*>(message.payload));  // 设置数据
+
+        // 调用 Java 中的回调方法
+        env->CallVoidMethod(listenerGlobalRef, onPeerMessageMethod, jIpAddress, topic, payload);
+        // 释放局部引用
+        env->DeleteLocalRef(jIpAddress);
+        env->DeleteLocalRef(topic);
+        env->DeleteLocalRef(payload);
     }
     static JavaVM* javaVM; // 全局 JavaVM 对象
 private:
