@@ -18,7 +18,7 @@ class CaptureDevicesActivity : AppCompatActivity() {
         setContentView(binding.root)
         BLRTCServerSession.run {
             onConnectListener = object : OnConnectListener {
-                override fun onPeerAddress(ipAddress: String, deviceName: String?, devieType: Int) {
+                override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
                     Log.d(
                         "Native",
                         "Peer Address: $ipAddress, Device: $deviceName, thread: ${Thread.currentThread().name}"

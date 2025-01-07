@@ -114,7 +114,7 @@ public:
         jstring jIpAddress = env->NewStringUTF(client.ip.c_str());
         jstring jDeviceName = env->NewStringUTF(client.name.c_str());
         jstring jDeviceType;
-        if (client.device_type.empty() && !client.device_type.empty()) {
+        if (!client.device_type.empty()) {
             jDeviceType = env->NewStringUTF(client.device_type.c_str());
         } else {
             jDeviceType = env->NewStringUTF("0");
