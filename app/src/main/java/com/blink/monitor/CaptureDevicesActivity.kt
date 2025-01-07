@@ -24,7 +24,6 @@ class CaptureDevicesActivity : AppCompatActivity() {
                         "Peer Address: $ipAddress, Device: $deviceName, thread: ${Thread.currentThread().name}"
                     )
                     lifecycleScope.launch(Dispatchers.Main) {
-//                        binding.ipAddress.text = "Ip Address: $ipAddress"
                     }
                 }
 
@@ -34,17 +33,14 @@ class CaptureDevicesActivity : AppCompatActivity() {
                         "Client: $ipAddress, Status: $status, thread: ${Thread.currentThread().name}"
                     )
                     lifecycleScope.launch(Dispatchers.Main) {
-//                        binding.status.text = "status: $status"
+
                     }
                 }
-
             }
             createSession()
         }
 
-        binding.goMonitor.setOnClickListener {
-            startActivity(Intent(this, MonitorActivity::class.java))
-        }
+
     }
 
     override fun onDestroy() {

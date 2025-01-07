@@ -6,19 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blink.monitor.R
-import com.blink.monitor.bean.CaptureItem
+import com.blink.monitor.bean.PeerDeviceItem
 import com.blink.monitor.databinding.ItemCaptureDeviceBinding
 import com.blink.monitor.extention.onClick
+import com.blink.monitor.manager.PeerDeviceManager
 
 class CaptureDeviceAdapter: RecyclerView.Adapter<DeviceViewHolder>() {
 
-    private var data: MutableList<CaptureItem> = mutableListOf()
+    private var data: MutableList<PeerDeviceItem> = mutableListOf()
+
+    var connectAction: ((PeerDeviceItem) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         return DeviceViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_capture_device, parent, false))
     }
 
-    fun setData(dat: List<CaptureItem>) {
+    fun setData(dat: List<PeerDeviceItem>) {
         data.clear()
         data.addAll(dat)
         notifyDataSetChanged()
@@ -33,9 +36,12 @@ class CaptureDeviceAdapter: RecyclerView.Adapter<DeviceViewHolder>() {
         holder.setData(data[position], position)
         holder.itemView.onClick {
             data.forEachIndexed { index, _ ->
-                data[index].state = (index == position)
+                data[index].connectedState = (index == position)
             }
             notifyDataSetChanged()
+            it.post {
+                connectAction?.invoke(data[position])
+            }
         }
         holder.binding.bottomLine.visibility = if(position != data.size - 1) View.VISIBLE else View.GONE
     }
@@ -46,9 +52,9 @@ class DeviceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
     var binding = ItemCaptureDeviceBinding.bind(itemView)
 
-    fun setData(captureItem: CaptureItem, position: Int) {
-        binding.tvDeviceName.text = captureItem.name
-        binding.actionCap.isSelected = captureItem.state
+    fun setData(captureItem: PeerDeviceItem, position: Int) {
+        binding.tvDeviceName.text = captureItem.deviceName
+        binding.actionCap.isSelected = captureItem.connectedState
 
     }
 
