@@ -59,21 +59,6 @@ class VideoPlayActivity : AppCompatActivity() {
                 startDecoding(surface)
             }
         }
-
-        BLRTCServerSession.onMessageListener = object : OnMessageListener {
-            override fun onDecodedFrame(pixelBuffer: ByteArray?) {
-                Log.d("Native", "pixelBuffer size:${pixelBuffer?.size}")
-                if (pixelBuffer != null) {
-                    handleDecodedData(pixelBuffer)
-                }
-            }
-
-            override fun onPeerMessage(client: String?, msgType: Int, msg: ByteArray?) {
-//                TODO("Not yet implemented")
-            }
-
-        }
-
     }
 
     private fun startDecoding(surface: Surface) {
