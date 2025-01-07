@@ -52,9 +52,6 @@ class ScoreboardWindow(context: Context) : PopupWindow(
             tab.setCustomView(getTabCustomView(context, position))
         }.attach()
 
-        binding.tvEvent.apply {
-            isTouchable = true
-        }
 
         binding.tabTeam.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {

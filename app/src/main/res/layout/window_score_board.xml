@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="500dp"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -22,7 +22,7 @@
             android:background="@drawable/shape_score_item"
             >
             <EditText
-                android:id="@+id/tv_event"
+                android:id="@+id/tv_event_game"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
@@ -37,7 +37,7 @@
                 tools:ignore="HardcodedText" />
 
             <ImageView
-                android:id="@+id/iv_event"
+                android:id="@+id/iv_game"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/iv_action_done"
@@ -80,8 +80,7 @@
             android:textColor="@color/white"
             android:text="Team Color"
             android:layout_marginTop="15dp"
-            android:textSize="12sp"
-            />
+            android:textSize="12sp" />
 
         <com.blink.monitor.view.ColorPlateView
             android:id="@+id/color_plate"
@@ -119,5 +118,7 @@
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 </FrameLayout>

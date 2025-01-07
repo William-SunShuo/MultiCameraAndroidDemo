@@ -17,6 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.blink.monitor.databinding.ActivityMonitorBinding
 import com.blink.monitor.extention.dp
+import com.blink.monitor.extention.gone
+import com.blink.monitor.extention.visible
+import com.blink.monitor.fragment.ScoreCountFragment
 import com.blink.monitor.fragment.ScorePanelFragment
 import com.blink.monitor.viewmodel.MonitorViewModel
 import com.blink.monitor.window.ScoreboardWindow
@@ -80,6 +83,8 @@ class MonitorActivity : AppCompatActivity() {
 
         viewModel.isShowScorePanel.observe(this) {
             binding.fragmentScore.visibility = if(it) View.VISIBLE else View.GONE
+            //如果是修改了数据，并且上一次是普通的fragment.
+
         }
 
         // 监听时间更新
@@ -98,6 +103,9 @@ class MonitorActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_score, ScorePanelFragment())
             .commit()
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_score_count, ScoreCountFragment()).commit()
     }
 
     private fun setFullScreen() {
@@ -126,7 +134,23 @@ class MonitorActivity : AppCompatActivity() {
     }
 
     private fun toggleScoreBoard(view: View, showScoreBoard: Boolean) {
-        viewModel.showScorePanel(showScoreBoard)
+        //如果面板没有内容，就隐藏.如果是积分器点击就切换
+        with(binding) {
+            when(fragmentScoreCount.visibility) {
+                View.VISIBLE -> {
+                    viewModel.showScorePanel(true)
+                    fragmentScoreCount.gone()
+                }
+                else -> {
+                    viewModel.showScorePanel(false)
+                    fragmentScoreCount.visible()
+                }
+            }
+        }
+
+
+
+//        viewModel.showScorePanel(showScoreBoard)
     }
 
     private fun toggleDirection(showDirection: Boolean) {

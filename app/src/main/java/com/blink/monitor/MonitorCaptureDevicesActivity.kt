@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blink.monitor.adapter.CaptureDeviceAdapter
-import com.blink.monitor.bean.CaptureItem
 import com.blink.monitor.bean.PeerDeviceItem
 import com.blink.monitor.databinding.ActivityMonitorCaptureDevicesBinding
 import com.blink.monitor.extention.onClick

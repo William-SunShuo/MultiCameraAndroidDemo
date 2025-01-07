@@ -10,6 +10,9 @@ class TeamPageAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter
     override fun getItemCount() = 2
 
     override fun createFragment(position: Int): Fragment {
-       return HomeTeamFragment()
+        return when(position) {
+            0 -> HomeTeamFragment()
+            else -> AwayTeamFragment()
+        }
     }
 }

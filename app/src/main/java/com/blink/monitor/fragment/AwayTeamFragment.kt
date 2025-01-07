@@ -11,7 +11,7 @@ import com.blink.monitor.R
 import com.blink.monitor.extention.onClick
 import com.blink.monitor.viewmodel.MonitorViewModel
 
-class HomeTeamFragment: Fragment() {
+class AwayTeamFragment: Fragment() {
 
     private val viewModel: MonitorViewModel by lazy {
         ViewModelProvider(this)[MonitorViewModel::class.java]
@@ -30,12 +30,11 @@ class HomeTeamFragment: Fragment() {
 
     private fun initView(view: View) {
 
-
         val etContent = view.findViewById<TextView>(R.id.et_event)
         val ivDone = view.findViewById<View>(R.id.iv_event)
 
         ivDone.onClick {
-            viewModel.homeTeamName.value = etContent.text.toString()
+            viewModel.awayTeamName.value = etContent.text.toString()
         }
     }
 }

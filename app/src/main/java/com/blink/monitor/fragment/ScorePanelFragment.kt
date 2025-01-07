@@ -7,13 +7,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.blink.monitor.R
 import com.blink.monitor.databinding.WindowScoreBoardBinding
+import com.blink.monitor.extention.onClick
+import com.blink.monitor.viewmodel.MonitorViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 
 class ScorePanelFragment: BaseViewBindingFragment<WindowScoreBoardBinding>() {
+
+
+    private val viewModel: MonitorViewModel by lazy {
+        ViewModelProvider(this)[MonitorViewModel::class.java]
+    }
 
 
     override fun initView(view: View, savedInstanceState: Bundle?) {
@@ -24,6 +32,7 @@ class ScorePanelFragment: BaseViewBindingFragment<WindowScoreBoardBinding>() {
                 tab.setCustomView(getTabCustomView(context, position))
             }.attach()
         }
+
         binding.tabTeam.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.also {
@@ -32,7 +41,6 @@ class ScorePanelFragment: BaseViewBindingFragment<WindowScoreBoardBinding>() {
                         teamTv?.typeface = Typeface.DEFAULT_BOLD
                     }
                 }
-
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -47,6 +55,21 @@ class ScorePanelFragment: BaseViewBindingFragment<WindowScoreBoardBinding>() {
 
             }
         })
+
+        binding.ivGame.onClick {
+            viewModel.gameNameOrEvent.value = binding.tvEventGame.text.toString()
+        }
+
+        binding.colorPlate.apply {
+            colorAction = { color ->
+                when(binding.vpTeam.currentItem) {
+                    0 -> viewModel.colorOfHomeTeam.value = color
+                    1 -> viewModel.colorOfAwayTeam.value = color
+                }
+            }
+        }
+
+//        viewModel
 
         binding.checkScore.setOnClickListener {
 

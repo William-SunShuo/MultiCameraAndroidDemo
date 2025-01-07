@@ -70,6 +70,10 @@ class ScoreCountView @JvmOverloads constructor(
         return binding.otherTeam.text.toString().toInt()
     }
 
+    fun getHomeTeam() =  binding.homeTeam
+
+    fun getAwayTeam() =  binding.homeTeam
+
     //设置比赛模式
     fun setGameType(type: GameType) {
         this.gameType = type

@@ -30,7 +30,15 @@ class MonitorViewModel : ViewModel() {
 
     var isShowScorePanel = MutableLiveData(false)
 
+    var homeTeamName = MutableLiveData<String>()
 
+    var awayTeamName = MutableLiveData<String>()
+
+    var gameNameOrEvent = MutableLiveData<String>()
+
+    var colorOfHomeTeam = MutableLiveData<Int>()
+
+    var colorOfAwayTeam = MutableLiveData<Int>()
 
     init {
         BLRTCServerSession.run {

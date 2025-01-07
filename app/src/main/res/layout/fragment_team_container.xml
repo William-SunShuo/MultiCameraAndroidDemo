@@ -15,7 +15,7 @@
         android:background="@drawable/shape_score_item"
         >
         <EditText
-            android:id="@+id/tv_event"
+            android:id="@+id/et_event"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:textSize="12sp"
