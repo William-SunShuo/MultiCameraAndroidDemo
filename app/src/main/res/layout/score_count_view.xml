@@ -79,7 +79,7 @@
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="12sp"
-            tools:text="Apex" />
+            android:text="Apex" />
 
         <View
             android:layout_width="0dp"
@@ -95,7 +95,7 @@
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="12sp"
-            tools:text="Galaxy" />
+            android:text="Galaxy" />
 
     </LinearLayout>
 

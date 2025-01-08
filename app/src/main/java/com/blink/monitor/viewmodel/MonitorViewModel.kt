@@ -28,7 +28,7 @@ class MonitorViewModel : ViewModel() {
     private val _isShowJoystick = MutableLiveData(false)
     val isShowJoystick = _isShowJoystick
 
-    var isShowScorePanel = MutableLiveData(false)
+//    var isShowScorePanel = MutableLiveData(false)
 
     var homeTeamName = MutableLiveData<String>()
 
@@ -36,9 +36,9 @@ class MonitorViewModel : ViewModel() {
 
     var gameNameOrEvent = MutableLiveData<String>()
 
-    var colorOfHomeTeam = MutableLiveData<Int>()
+    var colorOfHomeTeam = MutableLiveData(0)
 
-    var colorOfAwayTeam = MutableLiveData<Int>()
+    var colorOfAwayTeam = MutableLiveData(0)
 
     init {
         BLRTCServerSession.run {
@@ -67,9 +67,9 @@ class MonitorViewModel : ViewModel() {
         _isShowJoystick.value = boolean
     }
 
-    fun showScorePanel(state: Boolean) {
-        isShowScorePanel.value = state
-    }
+//    fun showScorePanel(state: Boolean) {
+//        isShowScorePanel.value = state
+//    }
 
     fun startTimer() {
         if (isRunning) return // 如果已经在计时，则不重复启动

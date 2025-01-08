@@ -6,16 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.blink.monitor.R
 import com.blink.monitor.extention.onClick
 import com.blink.monitor.viewmodel.MonitorViewModel
 
 class HomeTeamFragment: Fragment() {
 
-    private val viewModel: MonitorViewModel by lazy {
-        ViewModelProvider(this)[MonitorViewModel::class.java]
-    }
+    private val viewModel: MonitorViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

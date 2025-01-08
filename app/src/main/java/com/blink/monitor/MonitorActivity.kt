@@ -34,8 +34,6 @@ class MonitorActivity : AppCompatActivity() {
     private val viewModel: MonitorViewModel by viewModels()
     private val hideViews = mutableListOf<View>()
 
-    private var scorePopUp: ScoreboardWindow? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMonitorBinding.inflate(layoutInflater)
@@ -59,10 +57,12 @@ class MonitorActivity : AppCompatActivity() {
         ).forEach {
             it.setOnClickListener { view ->
                 val button = view as Button
-                button.isSelected = !button.isSelected
+                if(it.id != R.id.bt_scoreboard) {
+                    button.isSelected = !button.isSelected
+                }
                 when (it.id) {
                     R.id.bt_home -> finish()
-                    R.id.bt_scoreboard -> toggleScoreBoard(it, it.isSelected)
+                    R.id.bt_scoreboard -> toggleScoreBoard(it)
                     R.id.bt_direction -> toggleDirection(it.isSelected)
                     R.id.bt_mute -> toggleMute(it.isSelected)
                     R.id.bt_hide -> toggleViews(it.isSelected)
@@ -81,12 +81,6 @@ class MonitorActivity : AppCompatActivity() {
             binding.composeJoystickContainer.visibility = if (it) View.VISIBLE else View.GONE
         }
 
-        viewModel.isShowScorePanel.observe(this) {
-            binding.fragmentScore.visibility = if(it) View.VISIBLE else View.GONE
-            //如果是修改了数据，并且上一次是普通的fragment.
-
-        }
-
         // 监听时间更新
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -101,7 +95,7 @@ class MonitorActivity : AppCompatActivity() {
             .commit()
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_score, ScorePanelFragment())
+            .replace(R.id.fragment_score_panel, ScorePanelFragment())
             .commit()
 
         supportFragmentManager.beginTransaction()
@@ -133,24 +127,36 @@ class MonitorActivity : AppCompatActivity() {
 
     }
 
-    private fun toggleScoreBoard(view: View, showScoreBoard: Boolean) {
-        //如果面板没有内容，就隐藏.如果是积分器点击就切换
+    private fun toggleScoreBoard(view: View) {
         with(binding) {
             when(fragmentScoreCount.visibility) {
                 View.VISIBLE -> {
-                    viewModel.showScorePanel(true)
+                    fragmentScorePanel.visible()
                     fragmentScoreCount.gone()
                 }
                 else -> {
-                    viewModel.showScorePanel(false)
-                    fragmentScoreCount.visible()
+                    if(fragmentScorePanel.visibility == View.GONE) {
+                        fragmentScorePanel.visible()
+                        fragmentScoreCount.gone()
+                    } else {
+                        if(viewModel.awayTeamName.value.isNullOrBlank()
+                            && viewModel.homeTeamName.value.isNullOrBlank()
+                            && viewModel.gameNameOrEvent.value.isNullOrBlank()
+                            && viewModel.colorOfAwayTeam.value == 0
+                            && viewModel.colorOfHomeTeam.value == 0) {
+                            fragmentScorePanel.gone()
+                            fragmentScoreCount.gone()
+                        } else {
+                            fragmentScoreCount.visible()
+                            fragmentScorePanel.gone()
+                        }
+                    }
                 }
             }
+
+            view.isSelected = fragmentScoreCount.visibility == View.VISIBLE ||
+                    fragmentScorePanel.visibility == View.VISIBLE
         }
-
-
-
-//        viewModel.showScorePanel(showScoreBoard)
     }
 
     private fun toggleDirection(showDirection: Boolean) {
