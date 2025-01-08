@@ -1,17 +1,25 @@
 package com.blink.monitor
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Surface
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.blink.monitor.databinding.ActivityMainBinding
+import com.blink.monitor.extention.onClick
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -20,6 +28,20 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var ip: String? = null
+    var blrtc: BLRTCSession? = null
+
+    private val requestBluetoothPermissionLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                // 权限已授予
+                blrtc?.startPeerConnection(BluetoothAdapter.getDefaultAdapter().name ?: "", "3")
+            } else {
+                // 权限被拒绝
+                Toast.makeText(this, "蓝牙权限拒绝", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +53,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, CameraActivity::class.java))
         }
 
+        binding.btCapDevice.onClick {
+            startActivity(Intent(this, MonitorCaptureDevicesActivity::class.java))
+        }
+
         binding.btn.setOnClickListener {
-            BLRTCSession.apply {
+
+            blrtc = BLRTCSession.apply {
                 addListener(object : RTCSessionListener {
                     override fun onPeerConnection(status: Int) {
                         Log.d("Native", "onPeerConnection: $status")
@@ -49,8 +76,27 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 })
-                startPeerConnection(Build.MANUFACTURER, "3")
             }
+            if(Build.VERSION.SDK_INT > 31) {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val adapter = BluetoothAdapter.getDefaultAdapter()
+
+                    blrtc?.startPeerConnection(adapter.name, "3")
+
+                } else {
+                    requestBluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
+                }
+
+            } else {
+                val name = Settings.Secure.getString(contentResolver, "bluetooth_name")
+                blrtc?.startPeerConnection(name, "3")
+            }
+
+
         }
 
         binding.startMonitor.setOnClickListener{

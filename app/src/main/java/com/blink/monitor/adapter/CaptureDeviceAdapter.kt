@@ -9,7 +9,7 @@ import com.blink.monitor.R
 import com.blink.monitor.bean.PeerDeviceItem
 import com.blink.monitor.databinding.ItemCaptureDeviceBinding
 import com.blink.monitor.extention.onClick
-import com.blink.monitor.manager.PeerDeviceManager
+
 
 class CaptureDeviceAdapter: RecyclerView.Adapter<DeviceViewHolder>() {
 

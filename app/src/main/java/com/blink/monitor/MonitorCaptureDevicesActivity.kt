@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.blink.monitor.adapter.CaptureDeviceAdapter
+import com.blink.monitor.adapter.CaptureDeviceListAdapter
 import com.blink.monitor.bean.PeerDeviceItem
 import com.blink.monitor.databinding.ActivityMonitorCaptureDevicesBinding
 import com.blink.monitor.extention.onClick
@@ -20,7 +20,7 @@ class MonitorCaptureDevicesActivity: BaseBindingActivity<ActivityMonitorCaptureD
         return ActivityMonitorCaptureDevicesBinding.inflate(layoutInflater)
     }
 
-    private var mAdapter: CaptureDeviceAdapter? = null
+    private var mAdapter: CaptureDeviceListAdapter? = null
 
     override fun initView() {
 
@@ -30,9 +30,11 @@ class MonitorCaptureDevicesActivity: BaseBindingActivity<ActivityMonitorCaptureD
 
         binding.rvDevices.apply {
             layoutManager = LinearLayoutManager(context)
-            mAdapter = CaptureDeviceAdapter().apply {
-                connectAction = {
-                    BLRTCServerSession.connectPeerSession(it.ipAddress)
+            mAdapter = CaptureDeviceListAdapter().apply {
+                connectAction = {item ,position ->
+                    item.connectedState = true
+                    notifyItemChanged(position)
+                    BLRTCServerSession.connectPeerSession(item.ipAddress)
                 }
             }
             adapter = mAdapter
@@ -65,9 +67,8 @@ class MonitorCaptureDevicesActivity: BaseBindingActivity<ActivityMonitorCaptureD
             PeerDeviceManager.startPeerDevices()
             PeerDeviceManager.peerDeviceListener = { list ->
                 runOnUiThread {
-                    mAdapter?.setData(list)
+                    mAdapter?.submitList(list)
                 }
-
             }
         }
     }
