@@ -49,10 +49,10 @@ class MonitorViewModel : ViewModel() {
                 }
 
                 override fun onPeerMessage(
-                    client: String?, msgType: Int, msg: ByteArray?
+                    client: String?, topic: String, msg: ByteArray?
                 ) { //收到push端发送的消息，比如电量信息
-                    when (msgType) {
-                        1 -> { //电量信息
+                    when (topic) {
+                        "1" -> { //电量信息
                             val battery = String(msg!!)
                             _batteryLivaData.postValue(battery.toInt())
                         }
@@ -105,7 +105,7 @@ class MonitorViewModel : ViewModel() {
 
     fun sendControlMsg(msgType: Int, msg: ByteArray? = null) {
         Log.d("MonitorViewModel", "sendControlMsg: ${printCommand(msgType)}, $msg")
-        BLRTCServerSession.sendMessage(msg, msgType)
+//        BLRTCServerSession.sendMessage(msg, msgType)
     }
 
     override fun onCleared() {

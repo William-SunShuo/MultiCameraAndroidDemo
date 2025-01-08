@@ -1,27 +1,16 @@
 package com.blink.monitor
-
-import android.Manifest
-import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.Surface
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.blink.monitor.BLRTCSession.startPeerConnection
 import com.blink.monitor.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,28 +21,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var ip: String? = null
 
-
-    private val requestBluetoothPermissionLauncher: ActivityResultLauncher<String> =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                val deviceName = if (Build.VERSION.SDK_INT > 31) {
-                     BluetoothAdapter.getDefaultAdapter().name
-
-                } else {
-                    Settings.Secure.getString(contentResolver, "bluetooth_name")
-                }
-                // 权限已授予
-                startPeerConnection(deviceName, "3")
-            } else {
-                // 权限被拒绝
-                Toast.makeText(this, "权限被拒绝", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-
-    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -65,8 +32,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btn.setOnClickListener {
-
-
             BLRTCSession.apply {
                 addListener(object : RTCSessionListener {
                     override fun onPeerConnection(status: Int) {
@@ -76,48 +41,23 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun onPeerMessage(msgType: Int, data: ByteArray?) {
+                    override fun onPeerMessage(topic: String, data: ByteArray?) {
                         val msg = data?.let { String(it) }
-                        Log.d(
-                            "Native",
-                            "onPeerMessage,msgType: ${printCommand(msgType)}, msg: $msg"
-                        )
+                        Log.d("Native", "onPeerMessage, msg: $msg")
                         lifecycleScope.launch(Dispatchers.Main) {
-                            binding.tvMessage.text = "msgType: ${printCommand(msgType)}, msg: $msg"
+                            binding.tvMessage.text = "topic: $topic, msg: $msg"
                         }
                     }
                 })
-
-            }
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                val deviceName = if (Build.VERSION.SDK_INT > 31) {
-                    val adapter = BluetoothAdapter.getDefaultAdapter()
-                    adapter.name
-                } else {
-                    Settings.Secure.getString(contentResolver, "bluetooth_name")
-                }
-
-                startPeerConnection(deviceName = deviceName, "3")
-            } else {
-                requestBluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                startPeerConnection(Build.MANUFACTURER, "3")
             }
         }
 
-        binding.startMonitor.setOnClickListener {
+        binding.startMonitor.setOnClickListener{
             BLRTCServerSession.apply {
-                onConnectListener = object : OnConnectListener {
-                    override fun onPeerAddress(
-                        ipAddress: String,
-                        deviceName: String?,
-                        deviceType: String
-                    ) {
-                        Log.d(
-                            "Native",
-                            "Peer Address: $ipAddress, Device: $deviceName,deviceType: $deviceType, thread: ${Thread.currentThread().name}"
-                        )
+                onConnectListener = object:OnConnectListener{
+                    override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
+                        Log.d("Native", "Peer Address: $ipAddress, Device: $deviceName,deviceType: $deviceType, thread: ${Thread.currentThread().name}")
                         ip = ipAddress
                         lifecycleScope.launch(Dispatchers.Main) {
                             binding.ipAddress.text = "Ip Address: $ipAddress"
@@ -125,10 +65,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     override fun onPeerConnectStatus(ipAddress: String, status: Int) {
-                        Log.d(
-                            "Native",
-                            "Client: $ipAddress, Status: $status, thread: ${Thread.currentThread().name}"
-                        )
+                        Log.d("Native", "Client: $ipAddress, Status: $status, thread: ${Thread.currentThread().name}")
                         lifecycleScope.launch(Dispatchers.Main) {
                             binding.status.text = "status: $status"
                         }
@@ -143,8 +80,8 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun onPeerMessage(client: String?, msgType: Int, msg: ByteArray?) {
-//                TODO("Not yet implemented")
+                    override fun onPeerMessage(client: String?, topic: String, msg: ByteArray?) {
+                        Log.d("Native", "topic:$topic,msg:${msg?.let { String(it) }}")
                     }
 
                 }
@@ -171,14 +108,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.sendMessage.setOnClickListener {
-//            session?.run {
-//                val message = "Hello from Android"
-//                ip?.let {
-//                    sendMessage(message.toByteArray(), Command.ControlPhoto, it)
-//                }
-//            } ?: Toast.makeText(
-//                this, "Please start monitor first", Toast.LENGTH_SHORT
-//            ).show()
+            ip?.let {
+                BLRTCServerSession.sendMessage(it, "MB", 5, "hello".toByteArray())
+            }
         }
     }
 
