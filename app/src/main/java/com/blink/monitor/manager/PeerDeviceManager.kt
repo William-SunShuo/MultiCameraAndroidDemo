@@ -29,6 +29,7 @@ object PeerDeviceManager {
     fun startPeerDevices() {
         timer?.cancel()
         timer = Timer()
+
         timer?.schedule(object :TimerTask() {
             override fun run() {
                 checkDevicePeerState()

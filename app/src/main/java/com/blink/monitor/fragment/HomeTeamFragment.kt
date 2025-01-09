@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.blink.monitor.R
 import com.blink.monitor.extention.onClick
+import com.blink.monitor.extention.onClickSpring
 import com.blink.monitor.viewmodel.MonitorViewModel
 
 class HomeTeamFragment: Fragment() {
@@ -32,7 +33,7 @@ class HomeTeamFragment: Fragment() {
         val etContent = view.findViewById<TextView>(R.id.et_event)
         val ivDone = view.findViewById<View>(R.id.iv_event)
 
-        ivDone.onClick {
+        ivDone.onClickSpring {
             viewModel.homeTeamName.value = etContent.text.toString()
         }
     }

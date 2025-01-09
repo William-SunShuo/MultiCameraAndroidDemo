@@ -50,7 +50,6 @@ class DeviceHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     fun setData(captureItem: PeerDeviceItem, position: Int) {
         binding.tvDeviceName.text = captureItem.deviceName
         binding.actionCap.isSelected = captureItem.connectedState
-
     }
 
 }
