@@ -78,8 +78,7 @@ class MonitorCaptureDevicesActivity: BaseBindingActivity<ActivityMonitorCaptureD
         super.onDestroy()
         BLRTCServerSession.run {
             onConnectListener = null
-            destroySession()
-            PeerDeviceManager.stopPeerDevices()
         }
+        PeerDeviceManager.stopPeerDevices()
     }
 }

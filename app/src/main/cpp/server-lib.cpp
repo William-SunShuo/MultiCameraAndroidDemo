@@ -3,6 +3,7 @@
 #include "BLNSPServer.hpp"
 #include "LogcatBuffer.hpp"
 #include <android/log.h>
+#include "monitor-mqtt-message.h"
 #define  LOG_TAG    "Native"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #include <android/native_window_jni.h>

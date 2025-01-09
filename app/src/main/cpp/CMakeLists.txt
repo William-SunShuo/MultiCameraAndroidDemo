@@ -2,16 +2,19 @@ cmake_minimum_required(VERSION 3.22.1)
 project("multiCamera")
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/srt")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push/android")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push/linux")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server/android")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server/linux")
+include_directories(
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/srt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sdk/message"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push/android"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push/linux"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server/android"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server/linux"
+)
 
-file(GLOB_RECURSE push_src_files ${push_src_files} "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push/*.cpp")
-file(GLOB_RECURSE server_src_files ${server_src_files} "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server/*.cpp")
+file(GLOB_RECURSE push_src_files ${push_src_files} "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/push/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/sdk/message/*.c")
+file(GLOB_RECURSE server_src_files ${server_src_files} "${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/server/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/sdk/message/*.c")
 add_library("push" SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
         native-lib.cpp LogcatBuffer.cpp ${push_src_files})
