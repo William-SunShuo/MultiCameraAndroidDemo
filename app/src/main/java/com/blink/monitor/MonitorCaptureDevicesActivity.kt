@@ -62,7 +62,7 @@ class MonitorCaptureDevicesActivity: BaseBindingActivity<ActivityMonitorCaptureD
                     }
                 }
             }
-            createSession()
+//            createSession()
             PeerDeviceManager.startPeerDevices()
             PeerDeviceManager.peerDeviceListener = { list ->
                 runOnUiThread {

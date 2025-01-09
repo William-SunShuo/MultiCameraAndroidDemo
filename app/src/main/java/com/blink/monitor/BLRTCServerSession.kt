@@ -13,11 +13,11 @@ object BLRTCServerSession {
         System.loadLibrary("server")
     }
 
-    fun createSession() {
+    fun createSession(surface: Surface) {
         if (nativeHandle != 0L) {
             return
         }
-        nativeHandle = nativeCreate()
+        nativeHandle = nativeCreate(surface)
         addListener(object : BLRTCServerSessionListener {
             override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
                 onConnectListener?.onPeerAddress(ipAddress, deviceName, deviceType)
@@ -65,7 +65,7 @@ object BLRTCServerSession {
         listener: BLRTCServerSessionListener?, nativeHandle: Long = this.nativeHandle
     )
 
-    private external fun nativeCreate(): Long
+    private external fun nativeCreate(surface: Surface): Long
     private external fun nativeDestroy(nativeHandle: Long = this.nativeHandle)
 
 }

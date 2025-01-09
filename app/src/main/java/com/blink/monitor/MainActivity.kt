@@ -85,12 +85,11 @@ class MainActivity : AppCompatActivity() {
                     }
 
                 }
-                createSession()
-//                binding.surfaceView.surfaceTexture?.let {
-//                    val surface = Surface(it)
-////                    setSurface(surface)
-//                    createSession()
-//                }
+//                createSession()
+                binding.textureView.surfaceTexture?.let {
+                    val surface = Surface(it)
+                    createSession(surface)
+                }
             }
         }
 
