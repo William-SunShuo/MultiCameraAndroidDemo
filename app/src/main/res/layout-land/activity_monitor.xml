@@ -181,7 +181,7 @@
             android:textSize="11dp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.appcompat.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_dot_mark"
         android:layout_width="38dp"
         android:layout_height="38dp"

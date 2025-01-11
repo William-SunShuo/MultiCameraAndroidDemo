@@ -2,6 +2,10 @@
 #include <string>
 #include "BLRTCSession.hpp"
 #include "LogcatBuffer.hpp"
+#include "topic.hpp"
+extern "C" {
+  #include "monitor-mqtt-message.h"
+}
 #define  LOG_TAG    "Native"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
@@ -43,21 +47,110 @@ public:
         jclass listenerClass = env->GetObjectClass(globalListener);
         if (!listenerClass) return;
 
-        jmethodID onPeerMessageMethod = env->GetMethodID(listenerClass, "onPeerMessage",
-                                                         "(Ljava/lang/String;[B)V");
+        jmethodID onPeerMessageMethod = env->GetMethodID(listenerClass, "onPeerMessage","(Ljava/util/Map;)V");
         if (!onPeerMessageMethod) return;
-        // 将 C++ 中的 topic 转换为 jstring
-        jstring topic = env->NewStringUTF(message.topic);
-        auto payloadlen = static_cast<jsize>(message.payloadlen);
-        // 将 C++ 中的 payload 转换为 jbyteArray
-        jbyteArray payload = env->NewByteArray(payloadlen);  // 创建一个 Java 字节数组
-        env->SetByteArrayRegion(payload, 0, payloadlen, reinterpret_cast<const jbyte *>(message.payload));  // 设置数据
 
+        std::map<std::string, std::shared_ptr<Value>> data;
+        unpackMQTTMessage(message, data);
+        jclass mapClass = env->FindClass("java/util/HashMap");
+        jmethodID initMethod = env->GetMethodID(mapClass, "<init>", "()V");
+        jmethodID putMethod = env->GetMethodID(mapClass, "put",
+                                               "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+        jobject javaMap = env->NewObject(mapClass, initMethod);
+        for (const auto &pair: data) {
+            jstring key = env->NewStringUTF(pair.first.c_str());
+            jobject value = nullptr;
+            if (pair.second->getType() == "string") {
+//                value = env->NewStringUTF(pair.second->getStringValue().c_str());
+                std::string strValue = pair.second->getStringValue();
+                if (!strValue.empty()) {
+                    value = env->NewStringUTF(strValue.c_str());
+                } else {
+                    LOGD("Empty string value for key: %s", pair.first.c_str());
+                    value = env->NewStringUTF("");
+                }
+            } else if (pair.second->getType() == "int") {
+                jint intValue = pair.second->getIntValue();
+                jclass integerClass = env->FindClass("java/lang/Integer");
+                jmethodID intInitMethod = env->GetMethodID(integerClass, "<init>", "(I)V");
+                value = env->NewObject(integerClass, intInitMethod, intValue);
+                env->DeleteLocalRef(integerClass);
+            }
+            env->CallObjectMethod(javaMap, putMethod, key, value);
+            env->DeleteLocalRef(key);
+            env->DeleteLocalRef(value);
+        }
         // 调用 Java 中的回调方法
-        env->CallVoidMethod(globalListener, onPeerMessageMethod, topic, payload);
-        // 释放局部引用
-        env->DeleteLocalRef(topic);
-        env->DeleteLocalRef(payload);
+        env->CallVoidMethod(globalListener, onPeerMessageMethod, javaMap);
+        env->DeleteLocalRef(javaMap);
+        env->DeleteLocalRef(mapClass);
+        env->DeleteLocalRef(listenerClass);
+    }
+private:
+// 定义一个辅助方法，根据 topic 判断 payload 的类型并解包
+    static int unpackMQTTMessage(const MQTTMessage &message, std::map<std::string, std::shared_ptr<Value>>& data) {
+        if (!message.payload || message.payloadlen == 0 || !message.topic) {
+            std::cerr << "Invalid MQTTMessage input." << std::endl;
+            return -1; // 输入无效
+        }
+
+        std::string topic(message.topic);
+        data["topic"] = std::make_shared<StringValue>(topic); // Add topic to the map
+
+        // 根据 topic 确定消息类型
+        if (topic == TOPIC_MARKING) { //打点
+            MarkingInfo info{};
+            if (MarkingInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
+                return 0;
+            }
+        } else if (topic == TOPIC_RECORD_SWITCH) {  //录制开关
+            RecordSwitch info{};
+            if (RecordSwitchInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
+                data["isRecording"] = std::make_shared<IntValue>(info.u8RecordSwitch);
+                return 0;
+            }
+        } else if (topic == TOPIC_MUTE_SWITCH) { //静音开关
+            MuteSwitch info{};
+            if (MuteSwitchInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
+                data["isMuted"] = std::make_shared<IntValue>(info.u8MuteSwitch);
+                return 0;
+            }
+        } else if (topic == TOPIC_SYNCHRONIZE_SWITCH) { //同步开关
+            SynchronizeSwitch info{};
+            if (SynchronizeSwitchInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
+                data["Syn"] = std::make_shared<IntValue>(info.u8SynchronizeSwitch);
+                return 0;
+            }
+        } else if (topic == TOPIC_CAPTURED_SWITCH) { //拍摄端是否已经进入到拍摄页面
+            CapturedSwitch info{};
+            if (CapturedSwitchInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
+                data["isCaptured"] = std::make_shared<IntValue>(info.u8CapturedSwitch);
+                return 0;
+            }
+        } else if (topic == TOPIC_REMOTE_CTRL_STATE) { //遥控器控制信息
+            RemoteCtrlState info{};
+            if (RemoteCtrlStateUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
+                data["direction"] = std::make_shared<IntValue>(info.u8RemoteCtrlDirectionState);
+                data["operation"] = std::make_shared<IntValue>(info.u8RemoteCtrlOperationState);
+                return 0;
+            }
+        } else if (topic == TOPIC_SCOREBOARD_INFO) { //计分板信息
+            ScoreboardInfo info{};
+            if (ScoreboardInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
+                data["title"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.title));
+                data["homename"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.homename));
+                data["awayname"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.awayname));
+                data["section"] = std::make_shared<IntValue>(info.section);
+                data["hide"] = std::make_shared<IntValue>(info.hiden);
+                data["homescore"] = std::make_shared<IntValue>(info.homescore);
+                data["awayscore"] = std::make_shared<IntValue>(info.awayscore);
+                data["homecolor"] = std::make_shared<IntValue>(info.homecolor);
+                data["awaycolor"] = std::make_shared<IntValue>(info.awaycolor);
+                return 0;
+            }
+        }
+        std::cerr << "Unrecognized topic or unpacking failed: " << topic << std::endl;
+        return -1;
     }
 };
 
@@ -101,25 +194,6 @@ Java_com_blink_monitor_BLRTCSession_startPeerConnection(JNIEnv* env, jobject thi
 }
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_com_blink_monitor_BLRTCSession_sendPeerMessage(JNIEnv *env, jobject thiz, jstring topic, jint payloadlen,jbyteArray payload) {
-    if (!rtcSession) {
-        LOGD("RTC Session is not initialized.");
-        return;
-    }
-    // 获取 topic 字符串
-    const char *topic_cstr = env->GetStringUTFChars(topic, nullptr);
-    // 获取 payload 字节数组
-    jbyte *payload_bytes = env->GetByteArrayElements(payload, nullptr);
-    // 调用 C++ 的 sendPeerMessage 方法
-    rtcSession->sendPeerMessage(topic_cstr, payloadlen, payload_bytes);
-    // 释放相关内存
-    env->ReleaseStringUTFChars(topic, topic_cstr);
-    env->ReleaseByteArrayElements(payload, payload_bytes, 0); // 释放并可选设置 0 表示没有修改 payload
-
-}
-
-extern "C"
 JNIEXPORT jint JNICALL
 Java_com_blink_monitor_BLRTCSession_startLive(JNIEnv *env, jobject thiz, jstring url) {
     const char* nativeUrl = env->GetStringUTFChars(url, nullptr);
@@ -154,3 +228,64 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     javaVM = vm;
     return JNI_VERSION_1_6;
 }
+extern "C" {
+// Function to send PhonePower
+JNIEXPORT jint JNICALL Java_com_blink_monitor_BLRTCSession_sendPhonePowerMessage(
+        JNIEnv *env, jobject obj, jint powerPercentage) {
+    if (powerPercentage < 0 || powerPercentage > 100) {
+        return -1; // Invalid value
+    }
+
+    PhonePower phonePower{};
+    phonePower.u8PhonePower = static_cast<uint8_t>(powerPercentage);
+
+    int length = PhonePowerInfoLength();
+    uint8_t infoArray[length];
+
+    if (PhonePowerInfoPack(&phonePower, infoArray) != 0) {
+        return -1; // Packing failed
+    }
+    std::cout << "TOPIC_PHONE_POWER topic: " << TOPIC_PHONE_POWER << std::endl;
+    return rtcSession->sendPeerMessage(TOPIC_PHONE_POWER, length, infoArray);
+}
+
+
+// Function to send RemoteInfoState
+JNIEXPORT jint JNICALL Java_com_blink_monitor_BLRTCSession_sendRemoteInfoMessage(
+        JNIEnv *env, jobject obj, jint isConnected,
+        jint powerPercentage) {
+    if (powerPercentage < 0 || powerPercentage > 100) {
+        return -1; // Invalid value
+    }
+
+    RemoteInfoState remoteInfo{};
+    remoteInfo.u8RemoteConnectInfoState = isConnected;
+    remoteInfo.u8RemotePowerInfoState = static_cast<uint8_t>(powerPercentage);
+    int length = RemoteInfoStateLength();
+    uint8_t infoArray[length];
+
+    if (RemoteInfoStatePack(&remoteInfo, infoArray) != 0) {
+        return -1; // Packing failed
+    }
+    std::cout << "TOPIC_REMOTE_INFO_STATE topic: " << TOPIC_REMOTE_INFO_STATE << std::endl;
+    return rtcSession->sendPeerMessage(TOPIC_REMOTE_INFO_STATE, length, infoArray);
+}
+
+// Function to send CapturedSwitch
+JNIEXPORT jint JNICALL Java_com_blink_monitor_BLRTCSession_sendCapturedSwitchMessage(
+        JNIEnv *env, jobject obj, jint isCaptured) {
+    CapturedSwitch capturedSwitch{};
+    capturedSwitch.u8CapturedSwitch = isCaptured;
+
+    int length = CapturedSwitchInfoLength();
+    uint8_t infoArray[length];
+
+    if (CapturedSwitchInfoPack(&capturedSwitch, infoArray) != 0) {
+        return -1; // Packing failed
+    }
+    std::cout << "TOPIC_CAPTURED_SWITCH topic: " << TOPIC_CAPTURED_SWITCH << std::endl;
+    return rtcSession->sendPeerMessage(TOPIC_CAPTURED_SWITCH, length, infoArray);
+}
+}
+
+

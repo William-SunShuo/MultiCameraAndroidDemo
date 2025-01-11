@@ -1,11 +1,7 @@
 package com.blink.monitor
-
-
-import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -16,13 +12,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.blink.monitor.databinding.ActivityMonitorBinding
-import com.blink.monitor.extention.dp
 import com.blink.monitor.extention.gone
 import com.blink.monitor.extention.visible
 import com.blink.monitor.fragment.ScoreCountFragment
 import com.blink.monitor.fragment.ScorePanelFragment
 import com.blink.monitor.viewmodel.MonitorViewModel
-import com.blink.monitor.window.ScoreboardWindow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -164,35 +158,32 @@ class MonitorActivity : AppCompatActivity() {
     }
 
     private fun toggleMute(mute: Boolean) {
-        viewModel.sendControlMsg(ControlMute, if (mute) byteArrayOf(1) else byteArrayOf(0))
+        BLRTCServerSession.sendMuteSwitchMessage(if (mute) MUTE_YES else MUTE_NO)
     }
 
     private fun toggleViews(hide: Boolean) {
         if (hide) {
             // 隐藏所有视图
             hideViews.forEach { it.visibility = View.INVISIBLE }
-            viewModel.sendControlMsg(ControlHide)
         } else {
             // 显示所有视图
             hideViews.forEach { it.visibility = View.VISIBLE }
-            viewModel.sendControlMsg(ControlHide)
         }
     }
 
     private fun dotMark() {
-        viewModel.sendControlMsg(ControlDot)
+        BLRTCServerSession.sendMarkingMessage()
     }
 
     private fun toggleRecord(record: Boolean) {
         if (record) {
             // 开始录制
             viewModel.startTimer() // 启动计时器
-            viewModel.sendControlMsg(ControlStart)
         } else {
             // 停止录制
             viewModel.stopTimer() // 停止计时
-            viewModel.sendControlMsg(ControlStop)
         }
+        BLRTCServerSession.sendRecordSwitchMessage(if (record) START_RECORD else STOP_RECORD)
     }
 
     private fun changePhoneBattery(batteryLevel: Int) {

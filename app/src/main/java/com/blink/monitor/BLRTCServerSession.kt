@@ -1,6 +1,4 @@
 package com.blink.monitor
-import android.util.Log
-import android.view.Surface
 
 object BLRTCServerSession {
 
@@ -21,11 +19,10 @@ object BLRTCServerSession {
         addListener(object : BLRTCServerSessionListener {
             override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
                 onConnectListener?.onPeerAddress(ipAddress, deviceName, deviceType)
-                connectedIp = ipAddress
             }
 
             override fun onPeerConnectStatus(ipAddress: String, status: Int) {
-//                connectedIp = if (status == 1) ipAddress else null
+                connectedIp = if (status == 1) ipAddress else null
                 onConnectListener?.onPeerConnectStatus(ipAddress, status)
             }
 
@@ -33,9 +30,8 @@ object BLRTCServerSession {
                 onMessageListener?.onDecodedFrame(pixelBuffer)
             }
 
-            override fun onPeerMessage(client: String?, topic: String, msg: ByteArray?) {
-//                Log.d("Native", "msgType: ${printCommand(msgType)}")
-                onMessageListener?.onPeerMessage(client, topic, msg)
+            override fun onPeerMessage(javaMap: Map<String, Any>) {
+                onMessageListener?.onPeerMessage(javaMap)
             }
         })
         startSession()
@@ -52,13 +48,57 @@ object BLRTCServerSession {
     private external fun startSession(nativeHandle: Long = this.nativeHandle)
     external fun connectPeerSession(peerIp: String?, nativeHandle: Long = this.nativeHandle)
     private external fun stopSession(nativeHandle: Long = this.nativeHandle)
-    external fun sendMessage(
+
+    external fun sendMarkingMessage(
         clientIp: String? = this.connectedIp,
-        topic: String,
-        payloadLen: Int,
-        payload: ByteArray,
         nativeHandle: Long = this.nativeHandle
-    )
+    ): Int
+
+    external fun sendRecordSwitchMessage(
+        isRecording: Int,
+        clientIp: String? = this.connectedIp,
+        nativeHandle: Long = this.nativeHandle
+    ): Int
+
+    external fun sendMuteSwitchMessage(
+        muted: Int,
+        clientIp: String? = this.connectedIp,
+        nativeHandle: Long = this.nativeHandle
+    ): Int
+
+
+    external fun sendSynchronizeSwitchMessage(
+        synchronize: Boolean,
+        clientIp: String? = this.connectedIp,
+        nativeHandle: Long = this.nativeHandle
+    ): Int
+
+    external fun sendCapturedSwitchMessage(
+        isCaptured: Int,
+        clientIp: String? = this.connectedIp,
+        nativeHandle: Long = this.nativeHandle
+    ): Int
+
+    external fun sendRemoteCtrlMessage(
+        direction: Int,
+        operation: Int,
+        clientIp: String? = this.connectedIp,
+        nativeHandle: Long = this.nativeHandle
+    ): Int
+
+    external fun sendScoreboardMessage(
+        title: String,
+        hide: Int,
+        section: Int,
+        homeName: String,
+        homeColor: Int,
+        homeScore: Int,
+        awayName: String,
+        awayColor: Int,
+        awayScore: Int,
+        clientIp: String? = this.connectedIp,
+        nativeHandle: Long = this.nativeHandle
+    ): Int
 
     // 添加 addListener 方法
     private external fun addListener(
@@ -77,7 +117,7 @@ interface OnConnectListener {
 
 interface OnMessageListener {
     fun onDecodedFrame(pixelBuffer: ByteArray?)
-    fun onPeerMessage(ipAddress: String?, topic: String, msg: ByteArray?)
+    fun onPeerMessage(javaMap: Map<String, Any>)
 }
 
 // 定义监听器接口

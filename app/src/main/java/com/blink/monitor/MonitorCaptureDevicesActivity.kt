@@ -1,6 +1,4 @@
 package com.blink.monitor
-
-
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.lifecycleScope

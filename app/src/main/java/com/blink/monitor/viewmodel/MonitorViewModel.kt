@@ -1,12 +1,9 @@
 package com.blink.monitor.viewmodel
-
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blink.monitor.BLRTCServerSession
 import com.blink.monitor.OnMessageListener
-import com.blink.monitor.printCommand
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,17 +46,16 @@ class MonitorViewModel : ViewModel() {
                 }
 
                 override fun onPeerMessage(
-                    client: String?, topic: String, msg: ByteArray?
+                    javaMap: Map<String, Any>
                 ) { //收到push端发送的消息，比如电量信息
-                    when (topic) {
-                        "1" -> { //电量信息
-                            val battery = String(msg!!)
-                            _batteryLivaData.postValue(battery.toInt())
-                        }
-                    }
+//                    when (topic) {
+//                        "1" -> { //电量信息
+//                            _batteryLivaData.postValue(88)
+//                        }
+//                    }
                 }
             }
-//            createSession()
+            createSession()
         }
     }
 
@@ -101,11 +97,6 @@ class MonitorViewModel : ViewModel() {
             ) // HH:mm:ss
             else -> String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds) // mm:ss
         }
-    }
-
-    fun sendControlMsg(msgType: Int, msg: ByteArray? = null) {
-        Log.d("MonitorViewModel", "sendControlMsg: ${printCommand(msgType)}, $msg")
-//        BLRTCServerSession.sendMessage(msg, msgType)
     }
 
     override fun onCleared() {
