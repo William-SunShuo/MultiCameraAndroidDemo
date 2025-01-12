@@ -51,6 +51,18 @@ Java_com_blink_monitor_BLRTCServerSession_stopSession(JNIEnv *env, jobject thiz,
 }
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_com_blink_monitor_BLRTCServerSession_addSurface(JNIEnv *env, jobject thiz, jobject surface,
+                                                     jlong handle) {
+    auto *session = getNativeHandle(handle);
+    if (session) {
+        LOGI("addSurface");
+        ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
+        session->addSurface(nativeWindow);
+    }
+}
+
+extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_blink_monitor_BLRTCServerSession_nativeCreate(JNIEnv *env, jobject thiz) {
     std::cout.rdbuf(new AndroidBuf);

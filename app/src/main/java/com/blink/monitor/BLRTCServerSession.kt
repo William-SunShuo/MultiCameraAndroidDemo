@@ -1,4 +1,5 @@
 package com.blink.monitor
+import android.view.Surface
 
 object BLRTCServerSession {
 
@@ -48,6 +49,7 @@ object BLRTCServerSession {
     private external fun startSession(nativeHandle: Long = this.nativeHandle)
     external fun connectPeerSession(peerIp: String?, nativeHandle: Long = this.nativeHandle)
     private external fun stopSession(nativeHandle: Long = this.nativeHandle)
+    external fun addSurface(surface: Surface, nativeHandle: Long = this.nativeHandle)
 
     external fun sendMarkingMessage(
         clientIp: String? = this.connectedIp,

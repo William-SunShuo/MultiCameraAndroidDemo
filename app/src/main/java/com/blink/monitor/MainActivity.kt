@@ -70,34 +70,34 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onPeerMessage(javaMap: Map<String, Any>) {
                         lifecycleScope.launch(Dispatchers.Main) {
-                            when (javaMap["topic"]) {
+                            when (javaMap[KEY_TOPIC]) {
                                 TOPIC_MARKING -> {
                                     binding.tvMessage.text = "打点"
                                 }
 
                                 TOPIC_MUTE_SWITCH -> {
-                                    if (javaMap["isMuted"] == MUTE_YES) {
+                                    if (javaMap[KEY_IS_MUTED] == MUTE_YES) {
                                         binding.tvMessage.text = "静音"
                                     } else {
                                         binding.tvMessage.text = "取消静音"
                                     }
                                 }
                                 TOPIC_RECORD_SWITCH ->{
-                                    if (javaMap["isRecording"] == START_RECORD) {
+                                    if (javaMap[KEY_IS_RECORDING] == START_RECORD) {
                                         binding.tvMessage.text = "开始抓拍"
                                     } else {
                                         binding.tvMessage.text = "结束抓拍"
                                     }
                                 }
                                 TOPIC_CAPTURED_SWITCH ->{
-                                    if (javaMap["isCaptured"] == CAPTURE_YES) {
+                                    if (javaMap[KEY_IS_CAPTURED] == CAPTURE_YES) {
                                         binding.tvMessage.text = "在拍摄页面"
                                     } else {
                                         binding.tvMessage.text = "不在拍摄页面"
                                     }
                                 }
                                 TOPIC_REMOTE_CTRL_STATE -> {
-                                    val operation = javaMap["operation"]
+                                    val operation = javaMap[KEY_OPERATION]
                                     var operationStr = ""
                                     when (operation) {
                                         OPERATION_TAP -> {
@@ -107,10 +107,10 @@ class MainActivity : AppCompatActivity() {
                                             operationStr = "长按"
                                         }
                                         OPERATION__RELEASE -> {
-                                            operationStr = "松手"
+                                            binding.tvMessage.text = "松手"
                                         }
                                     }
-                                    when (javaMap["direction"]) {
+                                    when (javaMap[KEY_DIRECTION]) {
                                         CONTROL_UP -> {
                                             binding.tvMessage.text = "$operationStr：上"
                                         }
@@ -127,6 +127,19 @@ class MainActivity : AppCompatActivity() {
                                             binding.tvMessage.text = "$operationStr：右"
                                         }
                                     }
+                                }
+                                TOPIC_SCOREBOARD_INFO -> {   // 显示分数板信息
+                                     val title = javaMap[KEY_TITLE]
+                                     val team1Name = javaMap[KEY_HOME_NAME]
+                                     val team2Name = javaMap[KEY_AWAY_NAME]
+                                     val team1Color = javaMap[KEY_HOME_COLOR]
+                                     val team2Color = javaMap[KEY_AWAY_COLOR]
+                                     val hideScoreBoard = javaMap[KEY_HIDE_SCORE_BOARD]
+                                     val team1Score = javaMap[KEY_HOME_SCORE]
+                                     val team2Score = javaMap[KEY_AWAY_SCORE]
+                                     val section = javaMap[KEY_SECTION]
+                                     binding.tvMessage.text = "title: $title, 主队: $team1Name, 客队: $team2Name, 主队颜色: $team1Color, 客队颜色: $team2Color, 隐藏计分板: ${if (hideScoreBoard == HIDE_SCORE_BOARD_YES) "是" else "否"}, 主队分数: $team1Score, 客队分数: $team2Score, 第$section 节"
+
                                 }
                             }
                         }
@@ -156,72 +169,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.startMonitor.setOnClickListener{
-            BLRTCServerSession.apply {
-                onConnectListener = object:OnConnectListener{
-                    override fun onPeerAddress(ipAddress: String, deviceName: String?, deviceType: String) {
-                        Log.d("Native", "Peer Address: $ipAddress, Device: $deviceName,deviceType: $deviceType, thread: ${Thread.currentThread().name}")
-//                        if (ipAddress != "192.168.20.230") {
-//                            return
-//                        }
-                        ip = ipAddress
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            binding.ipAddress.text = "Ip Address: $ipAddress"
-                        }
-                    }
-
-                    override fun onPeerConnectStatus(ipAddress: String, status: Int) {
-                        Log.d("Native", "Client: $ipAddress, Status: $status, thread: ${Thread.currentThread().name}")
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            binding.status.text = "status: $status"
-                        }
-                    }
-
-                }
-                onMessageListener = object : OnMessageListener {
-                    override fun onDecodedFrame(pixelBuffer: ByteArray?) {
-                        Log.d("Native", "pixelBuffer size:${pixelBuffer?.size}")
-                        if (pixelBuffer != null) {
-                            handleDecodedData(pixelBuffer)
-                        }
-                    }
-
-                    override fun onPeerMessage(javaMap: Map<String, Any>) {
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            when (javaMap["topic"]) {
-                                TOPIC_PHONE_POWER -> {
-                                    binding.tvMessage.text = "电量：${javaMap["phonePower"]}"
-                                }
-
-                                TOPIC_REMOTE_INFO_STATE -> {
-                                    binding.tvMessage.text = "连接状态：${javaMap["remoteConnect"]},遥控器电量：${javaMap["remotePower"]}"
-                                }
-
-                                TOPIC_CAPTURED_SWITCH -> {
-                                    if (javaMap["isCaptured"] == CAPTURE_YES) {
-                                        binding.tvMessage.text = "在拍摄页面"
-                                    } else {
-                                        binding.tvMessage.text = "不在拍摄页面"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                createSession()
+//            BLRTCServerSession.apply {
+//                createSession()
 //                binding.surfaceView.surfaceTexture?.let {
 //                    val surface = Surface(it)
 ////                    setSurface(surface)
 //                    createSession()
 //                }
-            }
-        }
-
-        binding.connect.setOnClickListener {
-            ip?.let {
-                BLRTCServerSession.connectPeerSession(it)
-            } ?: Toast.makeText(
-                this@MainActivity, "no ip address", Toast.LENGTH_SHORT
-            ).show()
+//            }
+            startActivity(Intent(this, MonitorCaptureDevicesActivity::class.java))
         }
         binding.sendMessage.setOnClickListener {
             lifecycleScope.launch(Dispatchers.Main) {
@@ -249,8 +205,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        BLRTCServerSession.onConnectListener = null
-    }
 }

@@ -1,9 +1,19 @@
 package com.blink.monitor.viewmodel
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blink.monitor.BLRTCServerSession
+import com.blink.monitor.CAPTURE_YES
+import com.blink.monitor.KEY_IS_CAPTURED
+import com.blink.monitor.KEY_PHONE_POWER
+import com.blink.monitor.KEY_REMOTE_CONNECT
+import com.blink.monitor.KEY_REMOTE_POWER
+import com.blink.monitor.KEY_TOPIC
 import com.blink.monitor.OnMessageListener
+import com.blink.monitor.TOPIC_CAPTURED_SWITCH
+import com.blink.monitor.TOPIC_PHONE_POWER
+import com.blink.monitor.TOPIC_REMOTE_INFO_STATE
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +25,12 @@ class MonitorViewModel : ViewModel() {
 
     private val _batteryLivaData = MutableLiveData<Int>()
     var batteryLiveData = _batteryLivaData
+
+    private val _remoteConnectLivaData = MutableLiveData<Int>()
+    var remoteConnectLivaData = _remoteConnectLivaData
+
+    private val _remotePowerLivaData = MutableLiveData<Int>()
+    var remotePowerLivaData = _remotePowerLivaData
 
     private val _elapsedTime = MutableStateFlow("00:00") // 初始时间
     val elapsedTime: StateFlow<String> = _elapsedTime
@@ -48,11 +64,20 @@ class MonitorViewModel : ViewModel() {
                 override fun onPeerMessage(
                     javaMap: Map<String, Any>
                 ) { //收到push端发送的消息，比如电量信息
-//                    when (topic) {
-//                        "1" -> { //电量信息
-//                            _batteryLivaData.postValue(88)
-//                        }
-//                    }
+                    when (javaMap[KEY_TOPIC]) {
+                        TOPIC_PHONE_POWER -> {
+                            batteryLiveData.postValue(javaMap[KEY_PHONE_POWER] as Int?)
+                        }
+
+                        TOPIC_REMOTE_INFO_STATE -> {
+                            _remoteConnectLivaData.postValue(javaMap[KEY_REMOTE_CONNECT] as Int?)
+                            remotePowerLivaData.postValue(javaMap[KEY_REMOTE_POWER] as Int?)
+                        }
+
+                        TOPIC_CAPTURED_SWITCH -> {
+                            Log.d("Native", "在拍摄页面：${if (javaMap[KEY_IS_CAPTURED] == CAPTURE_YES) "是" else "否"}")
+                        }
+                    }
                 }
             }
             createSession()
@@ -101,6 +126,9 @@ class MonitorViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        BLRTCServerSession.onMessageListener = null
+        BLRTCServerSession.run {
+            onMessageListener = null
+            destroySession()
+        }
     }
 }

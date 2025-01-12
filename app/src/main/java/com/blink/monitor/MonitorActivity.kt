@@ -1,7 +1,7 @@
 package com.blink.monitor
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.view.Surface
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -34,6 +34,12 @@ class MonitorActivity : AppCompatActivity() {
         setContentView(binding.root)
         // 设置全屏
         setFullScreen()
+        binding.textureView.post {
+            binding.textureView.surfaceTexture?.let {
+                BLRTCServerSession.addSurface(Surface(it))
+            }
+        }
+
         hideViews.run {
             add(binding.btHome)
             add(binding.btDirection)
@@ -111,17 +117,17 @@ class MonitorActivity : AppCompatActivity() {
                 systemUiVisibility =
                     (View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
             }
-
-            post {
-                binding.cameraView.apply {
-                    Log.d("size", "width:${this.width}, height:${height}")
-                }
-            }
         }
 
     }
 
     private fun toggleScoreBoard(view: View) {
+        viewModel.colorOfHomeTeam.value?.let {
+            BLRTCServerSession.sendScoreboardMessage(
+                title = "Scoreboard",
+                hide = if (view.isSelected) HIDE_SCORE_BOARD_YES else HIDE_SCORE_BOARD_NO, section = 1, homeName = "江苏苏州", homeColor = 0xcccccc, homeScore = 3, awayName = "上海圣诞节", awayColor = 0xdddddd, awayScore = 77
+            )
+        }
         with(binding) {
             when(fragmentScoreCount.visibility) {
                 View.VISIBLE -> {

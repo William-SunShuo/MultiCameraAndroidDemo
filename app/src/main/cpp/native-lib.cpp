@@ -118,7 +118,7 @@ private:
         } else if (topic == TOPIC_SYNCHRONIZE_SWITCH) { //同步开关
             SynchronizeSwitch info{};
             if (SynchronizeSwitchInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
-                data["Syn"] = std::make_shared<IntValue>(info.u8SynchronizeSwitch);
+                data["sync"] = std::make_shared<IntValue>(info.u8SynchronizeSwitch);
                 return 0;
             }
         } else if (topic == TOPIC_CAPTURED_SWITCH) { //拍摄端是否已经进入到拍摄页面
@@ -138,14 +138,14 @@ private:
             ScoreboardInfo info{};
             if (ScoreboardInfoUnPack(&info, static_cast<const uint8_t *>(message.payload), message.payloadlen) == 0) {
                 data["title"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.title));
-                data["homename"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.homename));
-                data["awayname"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.awayname));
+                data["homeName"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.homename));
+                data["awayName"] = std::make_shared<StringValue>(reinterpret_cast<char *>(info.awayname));
                 data["section"] = std::make_shared<IntValue>(info.section);
-                data["hide"] = std::make_shared<IntValue>(info.hiden);
-                data["homescore"] = std::make_shared<IntValue>(info.homescore);
-                data["awayscore"] = std::make_shared<IntValue>(info.awayscore);
-                data["homecolor"] = std::make_shared<IntValue>(info.homecolor);
-                data["awaycolor"] = std::make_shared<IntValue>(info.awaycolor);
+                data["hideScoreBoard"] = std::make_shared<IntValue>(info.hiden);
+                data["homeScore"] = std::make_shared<IntValue>(info.homescore);
+                data["awayScore"] = std::make_shared<IntValue>(info.awayscore);
+                data["homeColor"] = std::make_shared<IntValue>(info.homecolor);
+                data["awayColor"] = std::make_shared<IntValue>(info.awaycolor);
                 return 0;
             }
         }

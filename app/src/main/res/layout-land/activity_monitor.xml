@@ -7,8 +7,8 @@
     tools:ignore="MergeRootFrame,MissingDefaultResource"
     android:keepScreenOn="true">
 
-    <SurfaceView
-        android:id="@+id/cameraView"
+    <TextureView
+        android:id="@+id/texture_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -16,8 +16,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/record_button"
@@ -27,7 +25,7 @@
         android:background="@drawable/ic_record_start"
         android:stateListAnimator="@null"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="@id/cameraView"
+        app:layout_constraintRight_toRightOf="@id/texture_view"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -39,7 +37,7 @@
         android:layout_marginStart="21dp"
         android:background="@drawable/icon_home"
         app:layout_constraintBottom_toTopOf="@id/bt_scoreboard"
-        app:layout_constraintLeft_toLeftOf="@id/cameraView"
+        app:layout_constraintLeft_toLeftOf="@id/texture_view"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
@@ -103,8 +101,8 @@
         android:background="@drawable/shape_black_half_transparent"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="@+id/cameraView"
-        app:layout_constraintRight_toRightOf="@+id/cameraView"
+        app:layout_constraintLeft_toLeftOf="@+id/texture_view"
+        app:layout_constraintRight_toRightOf="@+id/texture_view"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -140,8 +138,8 @@
         android:paddingTop="3dp"
         android:paddingBottom="3dp"
         android:orientation="horizontal"
-        app:layout_constraintRight_toRightOf="@id/cameraView"
-        app:layout_constraintTop_toTopOf="@id/cameraView">
+        app:layout_constraintRight_toRightOf="@id/texture_view"
+        app:layout_constraintTop_toTopOf="@id/texture_view">
 
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -188,8 +186,8 @@
         android:layout_marginEnd="84dp"
         android:layout_marginBottom="38dp"
         android:background="@drawable/icon_dot_mark"
-        app:layout_constraintBottom_toBottomOf="@id/cameraView"
-        app:layout_constraintRight_toRightOf="@id/cameraView" />
+        app:layout_constraintBottom_toBottomOf="@id/texture_view"
+        app:layout_constraintRight_toRightOf="@id/texture_view" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_score_panel"
