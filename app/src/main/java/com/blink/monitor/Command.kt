@@ -5,7 +5,6 @@ const val CONTROL_DOWN = 1
 const val CONTROL_LEFT = 2
 const val CONTROL_RIGHT = 3
 const val CONTROL_RETURN = 4
-const val CONTROL_INVALID = 100
 
 const val OPERATION_TAP = 0
 const val OPERATION_LONG_CLICK = 1

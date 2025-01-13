@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                                             operationStr = "长按"
                                         }
                                         OPERATION__RELEASE -> {
-                                            binding.tvMessage.text = "松手"
+                                            operationStr = "松手"
                                         }
                                     }
                                     when (javaMap[KEY_DIRECTION]) {

@@ -56,10 +56,34 @@ class JoyStickFragment : Fragment() {
                         }
 
                         JoystickDirection.Release -> {
+                            when (lastDirectionType) {
+                                JoystickDirection.Up -> {
+                                    BLRTCServerSession.sendRemoteCtrlMessage(
+                                        CONTROL_UP, OPERATION__RELEASE
+                                    )
+                                }
+
+                                JoystickDirection.Down -> {
+                                    BLRTCServerSession.sendRemoteCtrlMessage(
+                                        CONTROL_DOWN, OPERATION__RELEASE
+                                    )
+                                }
+
+                                JoystickDirection.Left -> {
+                                    BLRTCServerSession.sendRemoteCtrlMessage(
+                                        CONTROL_LEFT, OPERATION__RELEASE
+                                    )
+                                }
+
+                                JoystickDirection.Right -> {
+                                    BLRTCServerSession.sendRemoteCtrlMessage(
+                                        CONTROL_RIGHT, OPERATION__RELEASE
+                                    )
+                                }
+
+                                else -> {}
+                            }
                             lastDirectionType = JoystickDirection.None
-                            BLRTCServerSession.sendRemoteCtrlMessage(
-                                CONTROL_INVALID, OPERATION__RELEASE
-                            )
                         }
 
                         JoystickDirection.UpTap -> {
