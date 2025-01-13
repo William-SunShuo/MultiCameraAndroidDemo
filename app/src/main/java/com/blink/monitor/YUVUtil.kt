@@ -214,7 +214,7 @@ object YUVUtil {
         }
 
         yBuffer = image.planes[0].buffer
-        vBuffer = image.planes[2].buffer
+        vBuffer = image.planes[1].buffer
 
         val ySize: Int = yBuffer!!.capacity()
         val vSize: Int = vBuffer!!.capacity()

@@ -101,8 +101,8 @@ class CameraActivity : AppCompatActivity() {
         val imageThread = HandlerThread("$TAG imageThread")
         imageThread.start()
         // Initialize ImageReader (for YUV format)
-        val imageReaderWidth = 1280  // You can use your desired width
-        val imageReaderHeight = 720  // You can use your desired height
+        val imageReaderWidth = 1920  // You can use your desired width
+        val imageReaderHeight = 1080  // You can use your desired height
         imageReader = ImageReader.newInstance(imageReaderWidth, imageReaderHeight, ImageFormat.YUV_420_888, 1)
         // Set the listener for ImageReader
         imageReader.setOnImageAvailableListener({ reader ->
