@@ -181,12 +181,11 @@ class MainActivity : AppCompatActivity() {
         }
         binding.sendMessage.setOnClickListener {
             lifecycleScope.launch(Dispatchers.Main) {
-//                delay(1000)
                 BLRTCSession.sendRemoteInfoMessage(CONNECT_REMOTE_YES,60)
-//                delay(1000)
-//                BLRTCSession.sendPhonePowerMessage(89)
-//                delay(1000)
-//                BLRTCSession.sendCapturedSwitchMessage(CAPTURE_YES)
+                delay(1000)
+                BLRTCSession.sendPhonePowerMessage(89)
+                delay(1000)
+                BLRTCSession.sendCapturedSwitchMessage(CAPTURE_YES)
             }
         }
     }

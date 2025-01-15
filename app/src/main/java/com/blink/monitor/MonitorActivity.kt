@@ -1,7 +1,8 @@
 package com.blink.monitor
 import android.os.Build
 import android.os.Bundle
-import android.view.Surface
+import android.util.Log
+import android.view.SurfaceHolder
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -34,12 +35,29 @@ class MonitorActivity : AppCompatActivity() {
         setContentView(binding.root)
         // 设置全屏
         setFullScreen()
-        binding.textureView.post {
-            binding.textureView.surfaceTexture?.let {
-                BLRTCServerSession.addSurface(Surface(it))
-            }
-        }
+//        binding.cameraView.post{
+//            binding.cameraView.apply {
+//                BLRTCServerSession.addSurface(holder.surface)
+//                Log.d("size", "width:${this.width}, height:${height}")
+//            }
+//        }
 
+        binding.cameraView.holder.addCallback(object : SurfaceHolder.Callback { // 监听surface创建
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                BLRTCServerSession.addSurface(holder.surface)
+            }
+
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+            }
+        })
         hideViews.run {
             add(binding.btHome)
             add(binding.btDirection)

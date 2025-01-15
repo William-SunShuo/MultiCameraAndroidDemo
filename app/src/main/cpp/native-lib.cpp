@@ -89,7 +89,7 @@ public:
 private:
 // 定义一个辅助方法，根据 topic 判断 payload 的类型并解包
     static int unpackMQTTMessage(const MQTTMessage &message, std::map<std::string, std::shared_ptr<Value>>& data) {
-        if (!message.payload || message.payloadlen == 0 || !message.topic) {
+        if (!message.payload || message.payloadlen == 0 || message.topic.empty()) {
             std::cerr << "Invalid MQTTMessage input." << std::endl;
             return -1; // 输入无效
         }
