@@ -3,7 +3,9 @@ import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
@@ -11,7 +13,9 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.Surface
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,11 +47,37 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    private var waterView: View? = null
+
+
+    fun getBitmapFromView(view: View): Bitmap {
+        // Define a bitmap with the same dimensions as the view
+        Log.d("getBitmapFromView", "width:${view.measuredWidth}, height:${view.measuredHeight}")
+        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        waterView = LayoutInflater.from(this).inflate(
+            R.layout.score_board_regular,
+            window.decorView as ViewGroup, false
+        )
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        waterView?.measure(widthSpec, heightSpec)
+
+        binding.imageView.post {
+
+            binding.bitmapView.setImageBitmap(getBitmapFromView(binding.scoreBoard.root))
+        }
+
 
         binding.recordButton.setOnClickListener {
             startActivity(Intent(this, CameraActivity::class.java))

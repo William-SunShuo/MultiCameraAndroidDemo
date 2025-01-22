@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!-- 时间显示 -->
+    <TextView
+        android:id="@+id/time_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/score_board_regular_gradient"
+        android:fontWeight="700"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="06:88"
+        android:textColor="#FFFFFF"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/gray_line"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/time_view"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+    <View
+        android:id="@+id/home_team_color"
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:background="#4b2ba5"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/gray_line"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+    <!-- 左队伍名字 -->
+    <TextView
+        android:id="@+id/home_team_name"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@drawable/score_board_regular_gradient"
+        android:fontWeight="600"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:text="Apex"
+        android:textColor="#FFFFFF"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/home_team_color"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+    <View
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/triangle_left"
+        app:layout_constraintEnd_toEndOf="@+id/triangle_left"
+        app:layout_constraintStart_toStartOf="@+id/triangle_left"
+        app:layout_constraintTop_toTopOf="@+id/triangle_left" />
+
+    <View
+        android:id="@+id/triangle_left"
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:background="@drawable/score_board_triangle_left"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/home_team_name"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+    <!-- 比分 -->
+    <TextView
+        android:id="@+id/score_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:fontWeight="900"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:text="0 - 0"
+        android:textColor="#000000"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/triangle_left"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+    <View
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/triangle_right"
+        app:layout_constraintEnd_toEndOf="@+id/triangle_right"
+        app:layout_constraintStart_toStartOf="@+id/triangle_right"
+        app:layout_constraintTop_toTopOf="@+id/triangle_right" />
+
+    <View
+        android:id="@+id/triangle_right"
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:background="@drawable/score_board_triangle_right"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/score_view"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+    <!-- 右队伍名字 -->
+    <TextView
+        android:id="@+id/away_team_name"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/score_board_regular_gradient"
+        android:fontWeight="600"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:text="Galaxy"
+        android:textColor="#FFFFFF"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/triangle_right"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+    <View
+        android:id="@+id/away_team_color"
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:background="#df95ff"
+        app:layout_constraintBottom_toBottomOf="@+id/time_view"
+        app:layout_constraintStart_toEndOf="@+id/away_team_name"
+        app:layout_constraintTop_toTopOf="@+id/time_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
