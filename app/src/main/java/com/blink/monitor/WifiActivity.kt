@@ -44,8 +44,7 @@ class WifiActivity: AppCompatActivity() {
             if (isGranted) {
                 // 权限已授予
                 binding.tvSsid.text = getSSID()
-//                connectToWiFi("鸡太美极速版", "li123456@")
-                connectWifi2("鸡太美", "li123456@")
+                connectWifi2(getSSID(), "li123456@")
             } else {
                 // 权限被拒绝
                 Toast.makeText(this, "权限被拒绝", Toast.LENGTH_SHORT).show()
