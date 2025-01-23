@@ -23,6 +23,7 @@ class MonitorCaptureDevicesActivity: BaseBindingActivity<ActivityMonitorCaptureD
     override fun initView() {
 
         binding.navigationBack.onClick {
+            BLRTCServerSession.destroySession()
             finish()
         }
 
